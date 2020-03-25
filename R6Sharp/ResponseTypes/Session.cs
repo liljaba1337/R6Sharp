@@ -1,53 +1,52 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
+﻿using System;
+using System.Text.Json.Serialization;
 
 namespace R6Sharp.ResponseTypes
 {
-    public class Session
+    internal class Session
     {
-        [JsonProperty("platformType")]
-        public string PlatformType { get; private set; }
+        [JsonPropertyName("platformType")]
+        internal string PlatformType { get; set; }
 
-        [JsonProperty("ticket")]
-        public string Ticket { get; private set; }
+        [JsonPropertyName("ticket")]
+        internal string Ticket { get; set; }
 
-        [JsonProperty("twoFactorAuthenticationTicket")]
-        public string? TwoFactorAuthenticationTicket { get; private set; }
+        [JsonPropertyName("profileId")]
+        internal Guid ProfileId { get; set; }
 
-        [JsonProperty("profileId")]
-        public Guid ProfileId { get; private set; }
+        [JsonPropertyName("userId")]
+        internal Guid UserId { get; set; }
 
-        [JsonProperty("userId")]
-        public Guid UserId { get; private set; }
+        [JsonPropertyName("nameOnPlatform")]
+        internal string NameOnPlatform { get; set; }
 
-        [JsonProperty("nameOnPlatform")]
-        public string NameOnPlatform { get; private set; }
+        [JsonPropertyName("environment")]
+        internal string Environment { get; set; }
 
-        [JsonProperty("environment")]
-        public string Environment { get; private set; }
+        [JsonPropertyName("expiration")]
+        internal DateTime Expiration { get; set; }
 
-        [JsonProperty("expiration")]
-        public DateTime Expiration { get; private set; }
+        [JsonPropertyName("clientIp")]
+        internal string ClientIp { get; set; }
 
-        [JsonProperty("clientIp")]
-        public string ClientIp { get; private set; }
+        [JsonPropertyName("clientIpCountry")]
+        internal string ClientIpCountry { get; set; }
 
-        [JsonProperty("clientIpCountry")]
-        public string ClientIpCountry { get; private set; }
+        [JsonPropertyName("serverTime")]
+        internal DateTime ServerTime { get; set; }
 
-        [JsonProperty("serverTime")]
-        public DateTime ServerTime { get; private set; }
+        [JsonPropertyName("sessionId")]
+        internal Guid SessionId { get; set; }
 
-        [JsonProperty("sessionId")]
-        public Guid SessionId { get; private set; }
+        [JsonPropertyName("sessionKey")]
+        internal string SessionKey { get; set; }
 
-        [JsonProperty("sessionKey")]
-        public string SessionKey { get; private set; }
+#nullable enable
+        [JsonPropertyName("twoFactorAuthenticationTicket")]
+        internal string? TwoFactorAuthenticationTicket { get; set; }
 
-        [JsonProperty("rememberMeTicket")]
-        public string? RememberMeTicket { get; private set; }
+        [JsonPropertyName("rememberMeTicket")]
+        internal string? RememberMeTicket { get; set; }
+#nullable disable
     }
 }
