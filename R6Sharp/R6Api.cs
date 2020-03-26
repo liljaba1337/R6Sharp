@@ -139,7 +139,7 @@ namespace R6Sharp
             }
             if (Queries != null)
             {
-                Url = $"{Url}?{Queries.ToString()}";
+                Url = $"{Url}?{Queries}";
             }
 
             var uri = new Uri(Url);
