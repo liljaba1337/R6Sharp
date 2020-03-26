@@ -9,6 +9,14 @@
     <RepositoryUrl>https://github.com/SergeantSerk/R6Sharp/</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <Description>(Unofficial) C# API wrapper for Rainbow 6 Siege stats</Description>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>

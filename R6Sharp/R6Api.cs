@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.IO;
 using System.Net;
 using System.Net.Mime;
 using System.Text;
@@ -102,15 +103,15 @@ namespace R6Sharp
             return JsonSerializer.Deserialize<RankedSearch>(response).Players;
         }
 
-        public async Task<object> GetOverallAsync(Guid[] Uuids, Platform Platform)
+        public async Task<Dictionary<string, CoreStatistics>> GetOverallAsync(Guid[] Uuids, Platform Platform, bool GetAll)
         {
             var queries = HttpUtility.ParseQueryString(string.Empty);
             queries.Add("populations", string.Join(',', Uuids));
-            queries.Add("statistics", Constants.StatisticsVariables);
+            queries.Add("statistics", GetAll ? Constants.AllStatisticsVariables : Constants.CoreStatisticsVariables);
 
             var uri = new Uri($"{string.Format(Endpoints.Overall, PlatformToGuid(Platform))}?{queries.ToString()}");
             var response = await GetAuthenticatedRequestAsync(uri).ConfigureAwait(false);
-            return null;
+            return GetAll ? JsonSerializer.Deserialize<AllStatisticsFetch>(response).All : JsonSerializer.Deserialize<CoreStatisticsFetch>(response).Core;
         }
 
         private static Guid PlatformToGuid(Platform Platform)
@@ -206,14 +207,10 @@ namespace R6Sharp
             string result;
             // Get result from Ubisoft and grab the json
             using (var response = (HttpWebResponse)request.GetResponse())
+            using (var stream = response.GetResponseStream())
+            using (var reader = new StreamReader(stream))
             {
-                using (var stream = response.GetResponseStream())
-                {
-                    var bytes = new byte[response.ContentLength];
-                    stream.Read(bytes);
-                    var charset = !string.IsNullOrWhiteSpace(response.CharacterSet) ? response.CharacterSet : "utf-8";
-                    result = Encoding.GetEncoding(charset).GetString(bytes);
-                }
+                result = await reader.ReadToEndAsync().ConfigureAwait(false);
             }
 
             return result;
