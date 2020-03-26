@@ -137,6 +137,11 @@ namespace R6Sharp
             queries.Add("profile_ids", string.Join(',', Uuids));
 
             var results = await GetDataAsync<ProfileSearch>(Endpoints.Progression, Platform, queries.ToString()).ConfigureAwait(false);
+            foreach (var result in results.Profiles)
+            {
+                // Attach link to player profile icon url
+                result.ProfileIcon = new Uri($"https://ubisoft-avatars.akamaized.net/{result.ProfileId.ToString()}/default_146_146.png?appId={Constants.Rainbow6S.ToString()}");
+            }
             return results.Profiles;
         }
 

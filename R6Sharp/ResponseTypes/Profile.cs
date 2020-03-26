@@ -23,5 +23,7 @@ namespace R6Sharp.ResponseTypes
 
         [JsonPropertyName("level")]
         public int Level { get; set; }
+
+        public Uri ProfileIcon { get; set; }
     }
 }
