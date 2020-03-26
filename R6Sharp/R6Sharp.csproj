@@ -2,6 +2,13 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageLicenseExpression></PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/SergeantSerk/R6Sharp/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/SergeantSerk/R6Sharp/</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Description>(Unofficial) C# API wrapper for Rainbow 6 Siege stats</Description>
   </PropertyGroup>
 
 </Project>
