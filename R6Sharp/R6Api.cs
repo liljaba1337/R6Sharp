@@ -13,6 +13,10 @@ namespace R6Sharp
 {
     public class R6Api
     {
+        #region Fields
+        /// <summary>
+        /// Region the player is based in.
+        /// </summary>
         public enum Region
         {
             APAC,   // Asia Pacific :(
@@ -20,6 +24,9 @@ namespace R6Sharp
             NCSA    // North, Central and South America
         }
 
+        /// <summary>
+        /// Platform the player is based on.
+        /// </summary>
         public enum Platform
         {
             Uplay,  // uplay
@@ -33,7 +40,7 @@ namespace R6Sharp
         private readonly string _credentialsb64;
 
         /// <summary>
-        /// Control if Ubisoft's session handler should remember current session.
+        /// Control if Ubisoft's session handler should remember current session. This can be controlled a
         /// </summary>
         public bool RememberMe { get; set; }
 
@@ -41,12 +48,35 @@ namespace R6Sharp
         /// Current session details with Ubisoft.
         /// </summary>
         public Session CurrentSession { get; private set; }
+        #endregion
 
+        #region Constructors
+        /// <summary>
+        /// Create a R6S API instance with remember me defaulting to true
+        /// </summary>
+        /// <param name="Email">
+        /// Email address of a Ubisoft account.
+        /// </param>
+        /// <param name="Password">
+        /// Password of a Ubisoft account.
+        /// </param>
         public R6Api(string Email, string Password) : this(Email, Password, true)
         {
 
         }
 
+        /// <summary>
+        /// Create a R6S API instance with optional remember me option.
+        /// </summary>
+        /// <param name="Email">
+        /// Email address of a Ubisoft account.
+        /// </param>
+        /// <param name="Password">
+        /// Password of a Ubisoft account.
+        /// </param>
+        /// <param name="RememberMe">
+        /// Option for Ubisoft to remember this instance's session (can be changed over time by <see cref="RememberMe"/>.
+        /// </param>
         public R6Api(string Email, string Password, bool RememberMe)
         {
             if (string.IsNullOrWhiteSpace(Email))
@@ -64,22 +94,43 @@ namespace R6Sharp
             var bytes = Encoding.UTF8.GetBytes(auth);
             _credentialsb64 = Convert.ToBase64String(bytes);
         }
+        #endregion
 
+        #region Publics
+        /// <summary>
+        /// Search for a player on Rainbow 6 Siege.
+        /// </summary>
+        /// <param name="Player">
+        /// The player name to search for.
+        /// </param>
+        /// <param name="Platform">
+        /// The platform the player is on.
+        /// </param>
+        /// <returns>
+        /// A list of players that matched the terms.
+        /// </returns>
         public async Task<List<Player>> SearchProfileAsync(string Player, Platform Platform)
         {
             var queries = HttpUtility.ParseQueryString(string.Empty);
             queries.Add("nameOnPlatform", HttpUtility.UrlEncode(Player));
-            queries.Add("platformType", PlatformToString(Platform));
+            queries.Add("platformType", Constants.PlatformToString(Platform));
 
             var results = await GetDataAsync<PlayerSearch>(Endpoints.Search, null, queries.ToString()).ConfigureAwait(false);
             return results.Players;
         }
 
-        public async Task<List<Profile>> GetProfileAsync(Guid Uuid, Platform Platform)
-        {
-            return await GetProfileAsync(new[] { Uuid }, Platform).ConfigureAwait(false);
-        }
-
+        /// <summary>
+        /// Get a list of basic profiles (like <see cref="Profile.XP"/> and <see cref="Profile.Level"/>).
+        /// </summary>
+        /// <param name="Uuids">
+        /// The UUIDs matching the player profiles (should be searched with <see cref="SearchProfileAsync(string, Platform)"/> beforehand).
+        /// </param>
+        /// <param name="Platform">
+        /// The platform <paramref name="Uuids"/> belong to.
+        /// </param>
+        /// <returns>
+        /// A list of basic profiles matching the request terms.
+        /// </returns>
         public async Task<List<Profile>> GetProfileAsync(Guid[] Uuids, Platform Platform)
         {
             var queries = HttpUtility.ParseQueryString(string.Empty);
@@ -87,6 +138,68 @@ namespace R6Sharp
 
             var results = await GetDataAsync<ProfileSearch>(Endpoints.Progression, Platform, queries.ToString()).ConfigureAwait(false);
             return results.Profiles;
+        }
+
+        /// <summary>
+        /// Get a list of ranked profiles (like <see cref="Ranked.SkillMean"/> or <see cref="Ranked.MMR"/>).
+        /// </summary>
+        /// <param name="Uuids">
+        /// The UUIDs matching the player profiles (should be searched with <see cref="SearchProfileAsync(string, Platform)"/> beforehand).
+        /// </param>
+        /// <param name="Platform">
+        /// The platform <paramref name="Uuids"/> belong to.
+        /// </param>
+        /// <param name="Region">
+        /// The region <paramref name="Uuids"/> belong to.
+        /// </param>
+        /// <param name="Season">
+        /// The seasonal stats to search for.
+        /// </param>
+        /// <returns>
+        /// A list of players matching the request terms in a dictionary (to be referenced with the player UUID as key).
+        /// </returns>
+        public async Task<Dictionary<string, Ranked>> GetRankedAsync(Guid[] Uuids, Platform Platform, Region Region, int Season)
+        {
+            var queries = HttpUtility.ParseQueryString(string.Empty);
+            queries.Add("profile_ids", string.Join(',', Uuids));
+            queries.Add("board_id", "pvp_ranked");
+            queries.Add("region_id", Constants.RegionToString(Region));
+            queries.Add("season_id", Season.ToString());
+
+            var results = await GetDataAsync<RankedSearch>(Endpoints.Ranked, Platform, queries.ToString()).ConfigureAwait(false);
+            return results.Players;
+        }
+
+        /// <summary>
+        /// Get a list of overall profiles (like <see cref="CoreStatistics.GeneralDeaths"/> or <see cref="CoreStatistics.GeneralTimePlayed"/>).
+        /// </summary>
+        /// <param name="Uuids">
+        /// The UUIDs matching the player profiles (should be searched with <see cref="SearchProfileAsync(string, Platform)"/> beforehand).
+        /// </param>
+        /// <param name="Platform">
+        /// The platform <paramref name="Uuids"/> belong to.
+        /// </param>
+        /// <param name="AllStats">
+        /// Get all stats from Ubisoft (note: this takes longer than others and contains everything e.g. weapons, operators).
+        /// </param>
+        /// <returns>
+        /// A list of players matching the request terms in a dictionary (to be referenced with the player UUID as key).
+        /// </returns>
+        public async Task<Dictionary<string, Statistics>> GetOverallAsync(Guid[] Uuids, Platform Platform, bool AllStats)
+        {
+            var queries = HttpUtility.ParseQueryString(string.Empty);
+            queries.Add("populations", string.Join(',', Uuids));
+            queries.Add("statistics", AllStats ? Constants.AllStatisticsVariables : Constants.CoreStatisticsVariables);
+
+            var results = await GetDataAsync<StatisticsFetch>(Endpoints.Overall, Platform, queries.ToString()).ConfigureAwait(false);
+            return results.Stats;
+        }
+        #endregion
+
+        #region Overloading Methods
+        public async Task<List<Profile>> GetProfileAsync(Guid Uuid, Platform Platform)
+        {
+            return await GetProfileAsync(new[] { Uuid }, Platform).ConfigureAwait(false);
         }
 
         public async Task<Dictionary<string, Ranked>> GetRankedAsync(Guid Uuid, Platform Platform, Region Region)
@@ -104,38 +217,18 @@ namespace R6Sharp
             return await GetRankedAsync(Uuids, Platform, Region, -1).ConfigureAwait(false);
         }
 
-        public async Task<Dictionary<string, Ranked>> GetRankedAsync(Guid[] Uuids, Platform Platform, Region Region, int Season)
-        {
-            var queries = HttpUtility.ParseQueryString(string.Empty);
-            queries.Add("profile_ids", string.Join(',', Uuids));
-            queries.Add("board_id", "pvp_ranked");
-            queries.Add("region_id", RegionToString(Region));
-            queries.Add("season_id", Season.ToString());
-
-            var results = await GetDataAsync<RankedSearch>(Endpoints.Ranked, Platform, queries.ToString()).ConfigureAwait(false);
-            return results.Players;
-        }
-
         public async Task<Dictionary<string, Statistics>> GetOverallAsync(Guid Uuid, Platform Platform, bool AllStats)
         {
             return await GetOverallAsync(new[] { Uuid }, Platform, AllStats).ConfigureAwait(false);
         }
+        #endregion
 
-        public async Task<Dictionary<string, Statistics>> GetOverallAsync(Guid[] Uuids, Platform Platform, bool AllStats)
-        {
-            var queries = HttpUtility.ParseQueryString(string.Empty);
-            queries.Add("populations", string.Join(',', Uuids));
-            queries.Add("statistics", AllStats ? Constants.AllStatisticsVariables : Constants.CoreStatisticsVariables);
-
-            var results = await GetDataAsync<StatisticsFetch>(Endpoints.Overall, Platform, queries.ToString()).ConfigureAwait(false);
-            return results.Stats;
-        }
-
+        #region Privates
         private async Task<T> GetDataAsync<T>(string Url, Platform? Platform, string Queries)
         {
             if (Platform != null)
             {
-                Url = string.Format(Url, PlatformToGuid(Platform ?? default));
+                Url = string.Format(Url, Constants.PlatformToGuid(Platform ?? default));
             }
             if (Queries != null)
             {
@@ -143,53 +236,13 @@ namespace R6Sharp
             }
 
             var uri = new Uri(Url);
-            var response = await GetAuthenticatedRequestAsync(uri).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<T>(response);
-        }
-
-        private static string PlatformToString(Platform Platform)
-        {
-            return Platform switch
-            {
-                Platform.PSN => "psn",
-                Platform.Uplay => "uplay",
-                Platform.XBL => "xbl",
-                _ => throw new Exception("Platform does not exist.")
-            };
-        }
-
-        private static string RegionToString(Region Region)
-        {
-            return Region switch
-            {
-                Region.APAC => "apac",
-                Region.EMEA => "emea",
-                Region.NCSA => "ncsa",
-                _ => throw new Exception("Region does not exist."),
-            };
-        }
-
-        private static Guid PlatformToGuid(Platform Platform)
-        {
-            return Platform switch
-            {
-                Platform.Uplay => Constants.Uplay,
-                Platform.PSN => Constants.PSN,
-                Platform.XBL => Constants.XBL,
-                _ => throw new Exception("Platform does not exist."),
-            };
-        }
-
-        private async Task<string> GetAuthenticatedRequestAsync(Uri uri)
-        {
             // Add authorization header with ticket
-            var headervaluepairs = new []
+            var headervaluepairs = new[]
             {
                 new KeyValuePair<HttpRequestHeader, string>(HttpRequestHeader.Authorization, $"Ubi_v1 t={await GetTicketAsync().ConfigureAwait(false)}")
             };
-
-            // Get result from endpoint
-            return await BuildRequestAsync(uri, headervaluepairs, null, true).ConfigureAwait(false);
+            var response = await BuildRequestAsync(uri, headervaluepairs, null, true).ConfigureAwait(false);
+            return JsonSerializer.Deserialize<T>(response);
         }
 
         /// <summary>
@@ -239,7 +292,7 @@ namespace R6Sharp
             // Build a web request to endpoint
             var request = WebRequest.CreateHttp(uri);
             // Set request method
-            request.Method = Get ? "GET" : "POST";
+            request.Method = Get ? WebRequestMethods.Http.Get : WebRequestMethods.Http.Post;
             // Apply usual request headers that should be in all requests to Ubisoft
             request.Headers.Add(HttpRequestHeader.ContentType, MediaTypeNames.Application.Json);
             request.Headers.Add("Ubi-AppId", Constants.Rainbow6S.ToString());
@@ -270,5 +323,6 @@ namespace R6Sharp
 
             return result;
         }
+        #endregion
     }
 }

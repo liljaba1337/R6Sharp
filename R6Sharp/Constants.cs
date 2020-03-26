@@ -1,4 +1,5 @@
 ﻿using System;
+using static R6Sharp.R6Api;
 
 namespace R6Sharp
 {
@@ -14,5 +15,38 @@ namespace R6Sharp
         internal static readonly Guid Uplay = Guid.Parse("5172a557-50b5-4665-b7db-e3f2e8c5041d");
         internal static readonly Guid PSN = Guid.Parse("05bfb3f7-6c21-4c42-be1f-97a33fb5cf66");
         internal static readonly Guid XBL = Guid.Parse("98a601e5-ca91-4440-b1c5-753f601a2c90");
+
+        internal static string PlatformToString(Platform Platform)
+        {
+            return Platform switch
+            {
+                Platform.PSN => "psn",
+                Platform.Uplay => "uplay",
+                Platform.XBL => "xbl",
+                _ => throw new Exception("Platform does not exist.")
+            };
+        }
+
+        internal static string RegionToString(Region Region)
+        {
+            return Region switch
+            {
+                Region.APAC => "apac",
+                Region.EMEA => "emea",
+                Region.NCSA => "ncsa",
+                _ => throw new Exception("Region does not exist."),
+            };
+        }
+
+        internal static Guid PlatformToGuid(Platform Platform)
+        {
+            return Platform switch
+            {
+                Platform.PSN => PSN,
+                Platform.Uplay => Uplay,
+                Platform.XBL => XBL,
+                _ => throw new Exception("Platform does not exist."),
+            };
+        }
     }
 }
