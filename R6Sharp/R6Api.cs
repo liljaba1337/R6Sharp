@@ -71,9 +71,13 @@ namespace R6Sharp
             queries.Add("nameOnPlatform", HttpUtility.UrlEncode(Player));
             queries.Add("platformType", PlatformToString(Platform));
 
-            var uri = new Uri($"{Endpoints.Search}?{queries.ToString()}");
-            var response = await GetAuthenticatedRequestAsync(uri).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<PlayerSearch>(response).Profiles;
+            var results = await GetDataAsync<PlayerSearch>(Endpoints.Search, null, queries.ToString()).ConfigureAwait(false);
+            return results.Players;
+        }
+
+        public async Task<List<Profile>> GetProfileAsync(Guid Uuid, Platform Platform)
+        {
+            return await GetProfileAsync(new[] { Uuid }, Platform).ConfigureAwait(false);
         }
 
         public async Task<List<Profile>> GetProfileAsync(Guid[] Uuids, Platform Platform)
@@ -81,14 +85,23 @@ namespace R6Sharp
             var queries = HttpUtility.ParseQueryString(string.Empty);
             queries.Add("profile_ids", string.Join(',', Uuids));
 
-            var uri = new Uri($"{string.Format(Endpoints.Progression, PlatformToGuid(Platform))}?{queries.ToString()}");
-            var response = await GetAuthenticatedRequestAsync(uri).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<ProfileSearch>(response).Profiles;
+            var results = await GetDataAsync<ProfileSearch>(Endpoints.Progression, Platform, queries.ToString()).ConfigureAwait(false);
+            return results.Profiles;
+        }
+
+        public async Task<Dictionary<string, Ranked>> GetRankedAsync(Guid Uuid, Platform Platform, Region Region)
+        {
+            return await GetRankedAsync(Uuid, Platform, Region, -1).ConfigureAwait(false);
+        }
+
+        public async Task<Dictionary<string, Ranked>> GetRankedAsync(Guid Uuid, Platform Platform, Region Region, int Season)
+        {
+            return await GetRankedAsync(new[] { Uuid }, Platform, Region, Season).ConfigureAwait(false);
         }
 
         public async Task<Dictionary<string, Ranked>> GetRankedAsync(Guid[] Uuids, Platform Platform, Region Region)
         {
-            return await GetRankedAsync(Uuids, Platform, Region, -1);
+            return await GetRankedAsync(Uuids, Platform, Region, -1).ConfigureAwait(false);
         }
 
         public async Task<Dictionary<string, Ranked>> GetRankedAsync(Guid[] Uuids, Platform Platform, Region Region, int Season)
@@ -99,20 +112,39 @@ namespace R6Sharp
             queries.Add("region_id", RegionToString(Region));
             queries.Add("season_id", Season.ToString());
 
-            var uri = new Uri($"{string.Format(Endpoints.Ranked, PlatformToGuid(Platform))}?{queries.ToString()}");
-            var response = await GetAuthenticatedRequestAsync(uri).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<RankedSearch>(response).Players;
+            var results = await GetDataAsync<RankedSearch>(Endpoints.Ranked, Platform, queries.ToString()).ConfigureAwait(false);
+            return results.Players;
         }
 
-        public async Task<Dictionary<string, CoreStatistics>> GetOverallAsync(Guid[] Uuids, Platform Platform, bool GetAll)
+        public async Task<Dictionary<string, Statistics>> GetOverallAsync(Guid Uuid, Platform Platform, bool AllStats)
+        {
+            return await GetOverallAsync(new[] { Uuid }, Platform, AllStats).ConfigureAwait(false);
+        }
+
+        public async Task<Dictionary<string, Statistics>> GetOverallAsync(Guid[] Uuids, Platform Platform, bool AllStats)
         {
             var queries = HttpUtility.ParseQueryString(string.Empty);
             queries.Add("populations", string.Join(',', Uuids));
-            queries.Add("statistics", GetAll ? Constants.AllStatisticsVariables : Constants.CoreStatisticsVariables);
+            queries.Add("statistics", AllStats ? Constants.AllStatisticsVariables : Constants.CoreStatisticsVariables);
 
-            var uri = new Uri($"{string.Format(Endpoints.Overall, PlatformToGuid(Platform))}?{queries.ToString()}");
+            var results = await GetDataAsync<StatisticsFetch>(Endpoints.Overall, Platform, queries.ToString()).ConfigureAwait(false);
+            return results.Stats;
+        }
+
+        private async Task<T> GetDataAsync<T>(string Url, Platform? Platform, string Queries)
+        {
+            if (Platform != null)
+            {
+                Url = string.Format(Url, PlatformToGuid(Platform ?? default));
+            }
+            if (Queries != null)
+            {
+                Url = $"{Url}?{Queries.ToString()}";
+            }
+
+            var uri = new Uri(Url);
             var response = await GetAuthenticatedRequestAsync(uri).ConfigureAwait(false);
-            return GetAll ? JsonSerializer.Deserialize<AllStatisticsFetch>(response).All : JsonSerializer.Deserialize<CoreStatisticsFetch>(response).Core;
+            return JsonSerializer.Deserialize<T>(response);
         }
 
         private static string PlatformToString(Platform Platform)
@@ -122,7 +154,7 @@ namespace R6Sharp
                 Platform.PSN => "psn",
                 Platform.Uplay => "uplay",
                 Platform.XBL => "xbl",
-                _ => throw new Exception("Platform does not exist.");
+                _ => throw new Exception("Platform does not exist.")
             };
         }
 
@@ -151,7 +183,7 @@ namespace R6Sharp
         private async Task<string> GetAuthenticatedRequestAsync(Uri uri)
         {
             // Add authorization header with ticket
-            var headervaluepairs = new KeyValuePair<HttpRequestHeader, string>[]
+            var headervaluepairs = new []
             {
                 new KeyValuePair<HttpRequestHeader, string>(HttpRequestHeader.Authorization, $"Ubi_v1 t={await GetTicketAsync().ConfigureAwait(false)}")
             };

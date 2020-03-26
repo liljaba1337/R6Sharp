@@ -7,7 +7,7 @@ namespace R6Sharp.ResponseTypes
     public class PlayerSearch
     {
         [JsonPropertyName("profiles")]
-        public List<Player> Profiles { get; set; }
+        public List<Player> Players { get; set; }
     }
 
     public class Player

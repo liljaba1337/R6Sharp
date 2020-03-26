@@ -34,12 +34,10 @@ namespace Example
             };
 
             var search = api.SearchProfileAsync("Pseudosin", R6Api.Platform.Uplay).Result;
-
-            var player = new [] { search[0].ProfileId };
             // var profile = api.GetProfileAsync(guids, R6Api.Platform.Uplay).Result;
-            var profile = api.GetProfileAsync(player, R6Api.Platform.Uplay).Result;
-            var ranked = api.GetRankedAsync(player, R6Api.Platform.Uplay, R6Api.Region.EMEA).Result;
-            var overall = api.GetOverallAsync(player, R6Api.Platform.Uplay, false).Result;
+            var profile = api.GetProfileAsync(search[0].ProfileId, R6Api.Platform.Uplay).Result;
+            var ranked = api.GetRankedAsync(search[0].ProfileId, R6Api.Platform.Uplay, R6Api.Region.EMEA).Result;
+            var overall = api.GetOverallAsync(search[0].ProfileId, R6Api.Platform.Uplay, false).Result;
 
             Console.WriteLine(search[0].UserId);
             Console.WriteLine(profile[0].Level);
