@@ -24,7 +24,7 @@ namespace Example
             var credentials = JsonSerializer.Deserialize<Credential>(json);
             var api = new R6Api(credentials.Email, credentials.Password);
 
-            var guids = new Guid[]
+            var guids = new []
             {
                 Guid.Parse("00000000-0000-0000-0000-000000000000"),
                 Guid.Parse("11111111-1111-1111-1111-111111111111"),
@@ -36,6 +36,10 @@ namespace Example
             var search = api.SearchProfileAsync("Pseudosin", R6Api.Platform.Uplay).Result;
             var profile = api.GetProfileAsync(new Guid[] { search[0].ProfileId }, R6Api.Platform.Uplay).Result;
             var ranked = api.GetRankedAsync(guids, R6Api.Platform.Uplay, R6Api.Region.EMEA).Result;
+
+            Console.WriteLine(search[0].UserId);
+            Console.WriteLine(profile[0].Level);
+            Console.WriteLine(ranked[profile[0].ProfileId.ToString()].Rank);
         }
     }
 }

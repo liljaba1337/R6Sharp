@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Net;
 using System.Net.Mime;
 using System.Text;
@@ -43,20 +45,25 @@ namespace R6Sharp
         /// </summary>
         public Session CurrentSession { get; private set; }
 
-        public R6Api(string email, string password, bool rememberMe = true)
+        public R6Api(string Email, string Password) : this(Email, Password, true)
         {
-            if (string.IsNullOrWhiteSpace(email))
+
+        }
+
+        public R6Api(string Email, string Password, bool RememberMe)
+        {
+            if (string.IsNullOrWhiteSpace(Email))
             {
                 throw new ArgumentNullException(this.GetType().FullName, "Email address cannot be null or empty.");
             }
-            else if (string.IsNullOrWhiteSpace(password))
+            else if (string.IsNullOrWhiteSpace(Password))
             {
                 throw new ArgumentNullException(this.GetType().FullName, "Password cannot be null or empty.");
             }
 
-            this.RememberMe = rememberMe;
+            this.RememberMe = RememberMe;
             // Generate an auth for acquiring a token
-            var auth = $"{email}:{password}";
+            var auth = $"{Email}:{Password}";
             var bytes = Encoding.UTF8.GetBytes(auth);
             _credentialsb64 = Convert.ToBase64String(bytes);
         }
@@ -68,7 +75,7 @@ namespace R6Sharp
             queries.Add("platformType", Platform.ToString().ToLower());
 
             var uri = new Uri($"{Endpoints.Search}?{queries.ToString()}");
-            var response = await GetAuthenticatedRequestAsync(uri);
+            var response = await GetAuthenticatedRequestAsync(uri).ConfigureAwait(false);
             return JsonSerializer.Deserialize<PlayerSearch>(response).Profiles;
         }
 
@@ -78,7 +85,7 @@ namespace R6Sharp
             queries.Add("profile_ids", string.Join(',', Uuids));
 
             var uri = new Uri($"{string.Format(Endpoints.Progression, PlatformToGuid(Platform))}?{queries.ToString()}");
-            var response = await GetAuthenticatedRequestAsync(uri);
+            var response = await GetAuthenticatedRequestAsync(uri).ConfigureAwait(false);
             return JsonSerializer.Deserialize<ProfileSearch>(response).Profiles;
         }
 
@@ -91,11 +98,22 @@ namespace R6Sharp
             queries.Add("season_id", Season.ToString());
 
             var uri = new Uri($"{string.Format(Endpoints.Ranked, PlatformToGuid(Platform))}?{queries.ToString()}");
-            var response = await GetAuthenticatedRequestAsync(uri);
+            var response = await GetAuthenticatedRequestAsync(uri).ConfigureAwait(false);
             return JsonSerializer.Deserialize<RankedSearch>(response).Players;
         }
 
-        private Guid PlatformToGuid(Platform Platform)
+        public async Task<object> GetOverallAsync(Guid[] Uuids, Platform Platform)
+        {
+            var queries = HttpUtility.ParseQueryString(string.Empty);
+            queries.Add("populations", string.Join(',', Uuids));
+            queries.Add("statistics", Constants.StatisticsVariables);
+
+            var uri = new Uri($"{string.Format(Endpoints.Overall, PlatformToGuid(Platform))}?{queries.ToString()}");
+            var response = await GetAuthenticatedRequestAsync(uri).ConfigureAwait(false);
+            return null;
+        }
+
+        private static Guid PlatformToGuid(Platform Platform)
         {
             return Platform switch
             {
@@ -111,11 +129,11 @@ namespace R6Sharp
             // Add authorization header with ticket
             var headervaluepairs = new KeyValuePair<HttpRequestHeader, string>[]
             {
-                new KeyValuePair<HttpRequestHeader, string>(HttpRequestHeader.Authorization, $"Ubi_v1 t={await GetTicketAsync()}")
+                new KeyValuePair<HttpRequestHeader, string>(HttpRequestHeader.Authorization, $"Ubi_v1 t={await GetTicketAsync().ConfigureAwait(false)}")
             };
 
             // Get result from endpoint
-            return await BuildRequestAsync(uri, headervaluepairs, null, true);
+            return await BuildRequestAsync(uri, headervaluepairs, null, true).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -153,14 +171,14 @@ namespace R6Sharp
                 };
 
                 // Get result from endpoint
-                var response = await BuildRequestAsync(new Uri(Endpoints.Sessions), headervaluepairs, data, false);
+                var response = await BuildRequestAsync(new Uri(Endpoints.Sessions), headervaluepairs, data, false).ConfigureAwait(false);
                 CurrentSession = JsonSerializer.Deserialize<Session>(response);
             }
 
             return CurrentSession.Ticket;
         }
 
-        private async Task<string> BuildRequestAsync(Uri uri, KeyValuePair<HttpRequestHeader, string>[] AdditionalHeaderValues, byte[] Data, bool Get = true)
+        private static async Task<string> BuildRequestAsync(Uri uri, KeyValuePair<HttpRequestHeader, string>[] AdditionalHeaderValues, byte[] Data, bool Get = true)
         {
             // Build a web request to endpoint
             var request = WebRequest.CreateHttp(uri);
