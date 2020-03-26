@@ -1,14 +1,10 @@
 ﻿using R6Sharp.ResponseTypes;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Mime;
 using System.Text;
-using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Web;
@@ -73,7 +69,7 @@ namespace R6Sharp
         {
             var queries = HttpUtility.ParseQueryString(string.Empty);
             queries.Add("nameOnPlatform", HttpUtility.UrlEncode(Player));
-            queries.Add("platformType", Platform.ToString().ToLower());
+            queries.Add("platformType", PlatformToString(Platform));
 
             var uri = new Uri($"{Endpoints.Search}?{queries.ToString()}");
             var response = await GetAuthenticatedRequestAsync(uri).ConfigureAwait(false);
@@ -90,12 +86,17 @@ namespace R6Sharp
             return JsonSerializer.Deserialize<ProfileSearch>(response).Profiles;
         }
 
-        public async Task<Dictionary<string, Ranked>> GetRankedAsync(Guid[] Uuids, Platform Platform, Region Region, int Season = -1)
+        public async Task<Dictionary<string, Ranked>> GetRankedAsync(Guid[] Uuids, Platform Platform, Region Region)
+        {
+            return await GetRankedAsync(Uuids, Platform, Region, -1);
+        }
+
+        public async Task<Dictionary<string, Ranked>> GetRankedAsync(Guid[] Uuids, Platform Platform, Region Region, int Season)
         {
             var queries = HttpUtility.ParseQueryString(string.Empty);
             queries.Add("profile_ids", string.Join(',', Uuids));
             queries.Add("board_id", "pvp_ranked");
-            queries.Add("region_id", Region.ToString().ToLower());
+            queries.Add("region_id", RegionToString(Region));
             queries.Add("season_id", Season.ToString());
 
             var uri = new Uri($"{string.Format(Endpoints.Ranked, PlatformToGuid(Platform))}?{queries.ToString()}");
@@ -112,6 +113,28 @@ namespace R6Sharp
             var uri = new Uri($"{string.Format(Endpoints.Overall, PlatformToGuid(Platform))}?{queries.ToString()}");
             var response = await GetAuthenticatedRequestAsync(uri).ConfigureAwait(false);
             return GetAll ? JsonSerializer.Deserialize<AllStatisticsFetch>(response).All : JsonSerializer.Deserialize<CoreStatisticsFetch>(response).Core;
+        }
+
+        private static string PlatformToString(Platform Platform)
+        {
+            return Platform switch
+            {
+                Platform.PSN => "psn",
+                Platform.Uplay => "uplay",
+                Platform.XBL => "xbl",
+                _ => throw new Exception("Platform does not exist.");
+            };
+        }
+
+        private static string RegionToString(Region Region)
+        {
+            return Region switch
+            {
+                Region.APAC => "apac",
+                Region.EMEA => "emea",
+                Region.NCSA => "ncsa",
+                _ => throw new Exception("Region does not exist."),
+            };
         }
 
         private static Guid PlatformToGuid(Platform Platform)
@@ -164,9 +187,9 @@ namespace R6Sharp
             if (expired)
             {
                 // Build json for remembering (or not) the user/session
-                byte[] data = Encoding.UTF8.GetBytes($"{{\"rememberMe\": {RememberMe.ToString().ToLower()}}}");
+                byte[] data = Encoding.UTF8.GetBytes($"{{\"rememberMe\": {(RememberMe ? "true" : "false")}}}");
                 // Add authorization header
-                var headervaluepairs = new KeyValuePair<HttpRequestHeader, string>[]
+                var headervaluepairs = new []
                 {
                     new KeyValuePair<HttpRequestHeader, string>(HttpRequestHeader.Authorization, $"Basic {_credentialsb64}")
                 };
@@ -179,7 +202,7 @@ namespace R6Sharp
             return CurrentSession.Ticket;
         }
 
-        private static async Task<string> BuildRequestAsync(Uri uri, KeyValuePair<HttpRequestHeader, string>[] AdditionalHeaderValues, byte[] Data, bool Get = true)
+        private static async Task<string> BuildRequestAsync(Uri uri, KeyValuePair<HttpRequestHeader, string>[] AdditionalHeaderValues, byte[] Data, bool Get)
         {
             // Build a web request to endpoint
             var request = WebRequest.CreateHttp(uri);
