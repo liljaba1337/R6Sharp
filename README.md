@@ -21,12 +21,14 @@ public static class Program
         };
 
         // Searches for a player with name and platform
-        var search = api.SearchProfileAsync("PlayerName", R6Api.Platform.Uplay).Result;
+        var search = api.SearchProfileAsync("Pseudosin", R6Api.Platform.Uplay).Result;
         // Gets players' profile using specified uuids and platform
-        var profile = api.GetProfileAsync(new Guid[] { search[0].ProfileId }, R6Api.Platform.Uplay).Result;
         // var profile = api.GetProfileAsync(guids, R6Api.Platform.Uplay).Result;
+        var profile = api.GetProfileAsync(search[0].ProfileId, R6Api.Platform.Uplay).Result;
         // Gets players' ranked stats using specified uuids, platform and region
-        var ranked = api.GetRankedAsync(guids, R6Api.Platform.Uplay, R6Api.Region.EMEA).Result;
+        var ranked = api.GetRankedAsync(search[0].ProfileId, R6Api.Platform.Uplay, R6Api.Region.EMEA).Result;
+        // Gets players' overall stats using specified uuids, platform and region (false for core, true for all)
+        var overall = api.GetOverallAsync(search[0].ProfileId, R6Api.Platform.Uplay, false).Result;
     }
 }
 ```
