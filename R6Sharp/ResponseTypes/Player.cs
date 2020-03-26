@@ -1,8 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace R6Sharp.ResponseTypes
 {
+    public class PlayerSearch
+    {
+        [JsonPropertyName("profiles")]
+        public List<Player> Profiles { get; set; }
+    }
+
     public class Player
     {
         [JsonPropertyName("profileId")]

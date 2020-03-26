@@ -1,8 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace R6Sharp.ResponseTypes
 {
+    public class RankedSearch
+    {
+        [JsonPropertyName("players")]
+        public Dictionary<string, Ranked> Players { get; set; }
+    }
+
     public class Ranked
     {
         [JsonPropertyName("kills")]

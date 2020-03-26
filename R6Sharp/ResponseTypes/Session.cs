@@ -3,50 +3,50 @@ using System.Text.Json.Serialization;
 
 namespace R6Sharp.ResponseTypes
 {
-    internal class Session
+    public class Session
     {
         [JsonPropertyName("platformType")]
-        internal string PlatformType { get; set; }
+        public string PlatformType { get; set; }
 
         [JsonPropertyName("ticket")]
-        internal string Ticket { get; set; }
+        public string Ticket { get; set; }
 
         [JsonPropertyName("profileId")]
-        internal Guid ProfileId { get; set; }
+        public Guid ProfileId { get; set; }
 
         [JsonPropertyName("userId")]
-        internal Guid UserId { get; set; }
+        public Guid UserId { get; set; }
 
         [JsonPropertyName("nameOnPlatform")]
-        internal string NameOnPlatform { get; set; }
+        public string NameOnPlatform { get; set; }
 
         [JsonPropertyName("environment")]
-        internal string Environment { get; set; }
+        public string Environment { get; set; }
 
         [JsonPropertyName("expiration")]
-        internal DateTime Expiration { get; set; }
+        public DateTime Expiration { get; set; }
 
         [JsonPropertyName("clientIp")]
-        internal string ClientIp { get; set; }
+        public string ClientIp { get; set; }
 
         [JsonPropertyName("clientIpCountry")]
-        internal string ClientIpCountry { get; set; }
+        public string ClientIpCountry { get; set; }
 
         [JsonPropertyName("serverTime")]
-        internal DateTime ServerTime { get; set; }
+        public DateTime ServerTime { get; set; }
 
         [JsonPropertyName("sessionId")]
-        internal Guid SessionId { get; set; }
+        public Guid SessionId { get; set; }
 
         [JsonPropertyName("sessionKey")]
-        internal string SessionKey { get; set; }
+        public string SessionKey { get; set; }
 
 #nullable enable
         [JsonPropertyName("twoFactorAuthenticationTicket")]
-        internal string? TwoFactorAuthenticationTicket { get; set; }
+        public string? TwoFactorAuthenticationTicket { get; set; }
 
         [JsonPropertyName("rememberMeTicket")]
-        internal string? RememberMeTicket { get; set; }
+        public string? RememberMeTicket { get; set; }
 #nullable disable
     }
 }

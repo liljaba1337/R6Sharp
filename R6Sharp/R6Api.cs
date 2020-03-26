@@ -72,14 +72,14 @@ namespace R6Sharp
             return JsonSerializer.Deserialize<PlayerSearch>(response).Profiles;
         }
 
-        public async Task<List<PlayerProfile>> GetProfileAsync(Guid[] Uuids, Platform Platform)
+        public async Task<List<Profile>> GetProfileAsync(Guid[] Uuids, Platform Platform)
         {
             var queries = HttpUtility.ParseQueryString(string.Empty);
             queries.Add("profile_ids", string.Join(',', Uuids));
 
-            var uri = new Uri($"{string.Format(Endpoints.Profile, PlatformToGuid(Platform))}?{queries.ToString()}");
+            var uri = new Uri($"{string.Format(Endpoints.Progression, PlatformToGuid(Platform))}?{queries.ToString()}");
             var response = await GetAuthenticatedRequestAsync(uri);
-            return JsonSerializer.Deserialize<PlayerProfileSearch>(response).Profiles;
+            return JsonSerializer.Deserialize<ProfileSearch>(response).Profiles;
         }
 
         public async Task<Dictionary<string, Ranked>> GetRankedAsync(Guid[] Uuids, Platform Platform, Region Region, int Season = -1)
