@@ -4,13 +4,13 @@ using System.Text.Json.Serialization;
 
 namespace R6Sharp.ResponseTypes
 {
-    public class ProfileSearch
+    public class ProfileInfoSearch
     {
         [JsonPropertyName("player_profiles")]
-        public List<Profile> Profiles { get; set; }
+        public List<ProfileInfo> Profiles { get; set; }
     }
 
-    public class Profile
+    public class ProfileInfo
     {
         [JsonPropertyName("xp")]
         public int XP { get; set; }

@@ -109,18 +109,18 @@ namespace R6Sharp
         /// <returns>
         /// A list of players that matched the terms.
         /// </returns>
-        public async Task<List<Player>> SearchProfileAsync(string Player, Platform Platform)
+        public async Task<List<PlayerInfo>> SearchProfileAsync(string Player, Platform Platform)
         {
             var queries = HttpUtility.ParseQueryString(string.Empty);
             queries.Add("nameOnPlatform", HttpUtility.UrlEncode(Player));
             queries.Add("platformType", Constants.PlatformToString(Platform));
 
-            var results = await GetDataAsync<PlayerSearch>(Endpoints.Search, null, queries.ToString()).ConfigureAwait(false);
+            var results = await GetDataAsync<PlayerInfoSearch>(Endpoints.Search, null, queries.ToString()).ConfigureAwait(false);
             return results.Players;
         }
 
         /// <summary>
-        /// Get a list of basic profiles (like <see cref="Profile.XP"/> and <see cref="Profile.Level"/>).
+        /// Get a list of basic profiles (like <see cref="ProfileInfo.XP"/> and <see cref="ProfileInfo.Level"/>).
         /// </summary>
         /// <param name="Uuids">
         /// The UUIDs matching the player profiles (should be searched with <see cref="SearchProfileAsync(string, Platform)"/> beforehand).
@@ -131,12 +131,12 @@ namespace R6Sharp
         /// <returns>
         /// A list of basic profiles matching the request terms.
         /// </returns>
-        public async Task<List<Profile>> GetProfileAsync(Guid[] Uuids, Platform Platform)
+        public async Task<List<ProfileInfo>> GetProfileAsync(Guid[] Uuids, Platform Platform)
         {
             var queries = HttpUtility.ParseQueryString(string.Empty);
             queries.Add("profile_ids", string.Join(',', Uuids));
 
-            var results = await GetDataAsync<ProfileSearch>(Endpoints.Progression, Platform, queries.ToString()).ConfigureAwait(false);
+            var results = await GetDataAsync<ProfileInfoSearch>(Endpoints.Progression, Platform, queries.ToString()).ConfigureAwait(false);
             foreach (var result in results.Profiles)
             {
                 // Attach link to player profile icon url
@@ -146,7 +146,7 @@ namespace R6Sharp
         }
 
         /// <summary>
-        /// Get a list of ranked profiles (like <see cref="Ranked.SkillMean"/> or <see cref="Ranked.MMR"/>).
+        /// Get a list of ranked profiles (like <see cref="RankedStats.SkillMean"/> or <see cref="RankedStats.MMR"/>).
         /// </summary>
         /// <param name="Uuids">
         /// The UUIDs matching the player profiles (should be searched with <see cref="SearchProfileAsync(string, Platform)"/> beforehand).
@@ -163,7 +163,7 @@ namespace R6Sharp
         /// <returns>
         /// A list of players matching the request terms in a dictionary (to be referenced with the player UUID as key).
         /// </returns>
-        public async Task<Dictionary<string, Ranked>> GetRankedAsync(Guid[] Uuids, Platform Platform, Region Region, int Season)
+        public async Task<Dictionary<string, RankedStats>> GetRankedAsync(Guid[] Uuids, Platform Platform, Region Region, int Season)
         {
             var queries = HttpUtility.ParseQueryString(string.Empty);
             queries.Add("profile_ids", string.Join(',', Uuids));
@@ -171,7 +171,7 @@ namespace R6Sharp
             queries.Add("region_id", Constants.RegionToString(Region));
             queries.Add("season_id", Season.ToString());
 
-            var results = await GetDataAsync<RankedSearch>(Endpoints.Ranked, Platform, queries.ToString()).ConfigureAwait(false);
+            var results = await GetDataAsync<RankedStatsSearch>(Endpoints.Ranked, Platform, queries.ToString()).ConfigureAwait(false);
             return results.Players;
         }
 
@@ -202,22 +202,22 @@ namespace R6Sharp
         #endregion
 
         #region Overloading Methods
-        public async Task<List<Profile>> GetProfileAsync(Guid Uuid, Platform Platform)
+        public async Task<List<ProfileInfo>> GetProfileAsync(Guid Uuid, Platform Platform)
         {
             return await GetProfileAsync(new[] { Uuid }, Platform).ConfigureAwait(false);
         }
 
-        public async Task<Dictionary<string, Ranked>> GetRankedAsync(Guid Uuid, Platform Platform, Region Region)
+        public async Task<Dictionary<string, RankedStats>> GetRankedAsync(Guid Uuid, Platform Platform, Region Region)
         {
             return await GetRankedAsync(Uuid, Platform, Region, -1).ConfigureAwait(false);
         }
 
-        public async Task<Dictionary<string, Ranked>> GetRankedAsync(Guid Uuid, Platform Platform, Region Region, int Season)
+        public async Task<Dictionary<string, RankedStats>> GetRankedAsync(Guid Uuid, Platform Platform, Region Region, int Season)
         {
             return await GetRankedAsync(new[] { Uuid }, Platform, Region, Season).ConfigureAwait(false);
         }
 
-        public async Task<Dictionary<string, Ranked>> GetRankedAsync(Guid[] Uuids, Platform Platform, Region Region)
+        public async Task<Dictionary<string, RankedStats>> GetRankedAsync(Guid[] Uuids, Platform Platform, Region Region)
         {
             return await GetRankedAsync(Uuids, Platform, Region, -1).ConfigureAwait(false);
         }
