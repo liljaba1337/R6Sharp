@@ -64,6 +64,9 @@ namespace R6Sharp.ResponseTypes
         [JsonPropertyName("generalpve_matchlost:infinite")]
         public int TrainingMatchesLost { get; set; }
 
+        [JsonPropertyName("generalpve_matchplayed:infinite")]
+        public int TrainingMatchesPlayed { get; set; }
+
         [JsonPropertyName("generalpve_timeplayed:infinite")]
         public long TrainingTimePlayed { get; set; }
         #endregion
