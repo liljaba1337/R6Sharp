@@ -17,7 +17,7 @@ namespace Example
             public string Password { get; set; }
         }
 
-        public static void Main(string[] args)
+        public static void Main()
         {
             // credentials.json = {"email": "email@email.com", "password": "somepassword"}
             var json = File.ReadAllText(@"..\..\..\..\credentials.json");
@@ -33,16 +33,18 @@ namespace Example
                 Guid.Parse("44444444-4444-4444-4444-444444444444")
             };
 
-            var search = api.SearchProfileAsync("Pseudosin", R6Api.Platform.Uplay).Result;
+            var search = api.SearchProfileAsync("GarlicSos", Platform.Uplay).Result;
             // var profile = api.GetProfileAsync(guids, R6Api.Platform.Uplay).Result;
-            var profile = api.GetProfileAsync(search[0].ProfileId, R6Api.Platform.Uplay).Result;
-            var ranked = api.GetRankedAsync(search[0].ProfileId, R6Api.Platform.Uplay, R6Api.Region.EMEA).Result;
-            var overall = api.GetOverallAsync(search[0].ProfileId, R6Api.Platform.Uplay, false).Result;
+            var profile = api.GetProfileAsync(search.ProfileId, Platform.Uplay).Result;
+            var ranked = api.GetRankedAsync(search.ProfileId, Platform.Uplay, Region.EMEA).Result;
+            var core = api.GetStatisticsAsync(search.ProfileId, Platform.Uplay, false).Result;
+            var objectives = api.GetObjectiveStatisticsAsync(search.ProfileId, Platform.Uplay).Result;
 
-            Console.WriteLine(search[0].UserId);
-            Console.WriteLine(profile[0].Level);
-            Console.WriteLine(ranked[profile[0].ProfileId.ToString()].Rank);
-            Console.WriteLine(overall[profile[0].ProfileId.ToString()].RankedMatchesPlayed);
+            Console.WriteLine($"Profile ID:         {search.UserId}");
+            Console.WriteLine($"Level:              {profile.Level}");
+            Console.WriteLine($"Rank:               {ranked[profile.ProfileId.ToString()].Rank}");
+            Console.WriteLine($"Ranked Matches:     {core[profile.ProfileId.ToString()].RankedMatchesPlayed}");
+            Console.WriteLine($"Best Bomb Score:    {objectives[profile.ProfileId.ToString()].BombBestScore}");
         }
     }
 }

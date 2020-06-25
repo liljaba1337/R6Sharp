@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 
-namespace R6Sharp.ResponseTypes
+namespace R6Sharp.Response
 {
     public class Session
     {

@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace R6Sharp.ResponseTypes
+namespace R6Sharp.Response.Statistic
 {
-    public class CoreStatisticsFetch
+    public class CoreStatisticFetch
     {
         [JsonPropertyName("results")]
-        public Dictionary<string, CoreStatistics> Core { get; set; }
+        public Dictionary<string, CoreStatistic> Core { get; set; }
     }
 
-    public class CoreStatistics
+    public class CoreStatistic
     {
         #region Casual
         [JsonPropertyName("casualpvp_kills:infinite")]

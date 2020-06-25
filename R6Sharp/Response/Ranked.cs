@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace R6Sharp.ResponseTypes
+namespace R6Sharp.Response
 {
-    public class RankedStatsSearch
+    public class RankedSearch
     {
         [JsonPropertyName("players")]
-        public Dictionary<string, RankedStats> Players { get; set; }
+        public Dictionary<string, Ranked> Players { get; set; }
     }
 
-    public class RankedStats
+    public class Ranked
     {
         [JsonPropertyName("kills")]
         public int Kills { get; set; }
