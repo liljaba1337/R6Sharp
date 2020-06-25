@@ -92,8 +92,6 @@ namespace R6Sharp
                 case StatisticsType.Objective:
                     line = ObjectiveStatisticsVariables;
                     break;
-                default:
-                    break;
             }
             return line.Split(',');
         }
