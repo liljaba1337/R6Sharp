@@ -1,4 +1,5 @@
 ﻿using R6Sharp.Response;
+using R6Sharp.Response.Static;
 using R6Sharp.Response.Statistic;
 using System;
 using System.Collections.Generic;
@@ -123,7 +124,7 @@ namespace R6Sharp
         /// Get a list of basic profiles (like <see cref="PlayerProgression.XP"/> and <see cref="PlayerProgression.Level"/>).
         /// </summary>
         /// <param name="uuids">
-        /// The UUIDs matching the player profiles (should be searched with <see cref="SearchProfileAsync(string, Platform)"/> beforehand).
+        /// The UUIDs matching the player profiles (should be searched with <see cref="GetProfileAsync(string, Platform)"/> beforehand).
         /// </param>
         /// <param name="platform">
         /// The platform <paramref name="uuids"/> belong to.
@@ -141,7 +142,6 @@ namespace R6Sharp
             foreach (var result in results.PlayerProgressions)
             {
                 // Attach link to player profile icon url
-                //result.ProfileIcon = new Uri($"https://ubisoft-avatars.akamaized.net/{result.ProfileId.ToString()}/default_146_146.png?appId={Constants.Rainbow6S.ToString()}");
                 result.ProfileIcon = new Uri(string.Format(Endpoint.Avatar, result.ProfileId, Constant.Rainbow6S));
             }
             return results.PlayerProgressions;
@@ -151,7 +151,7 @@ namespace R6Sharp
         /// Get a list of ranked profiles (like <see cref="Ranked.SkillMean"/> or <see cref="Ranked.MMR"/>).
         /// </summary>
         /// <param name="uuids">
-        /// The UUIDs matching the player profiles (should be searched with <see cref="SearchProfileAsync(string, Platform)"/> beforehand).
+        /// The UUIDs matching the player profiles (should be searched with <see cref="GetProfileAsync(string, Platform)"/> beforehand).
         /// </param>
         /// <param name="platform">
         /// The platform <paramref name="uuids"/> belong to.
@@ -182,7 +182,7 @@ namespace R6Sharp
         /// Get a list of overall profiles (like <see cref="CoreStatistic.GeneralDeaths"/> or <see cref="CoreStatistic.GeneralTimePlayed"/>).
         /// </summary>
         /// <param name="uuids">
-        /// The UUIDs matching the player profiles (should be searched with <see cref="SearchProfileAsync(string, Platform)"/> beforehand).
+        /// The UUIDs matching the player profiles (should be searched with <see cref="GetProfileAsync(string, Platform)"/> beforehand).
         /// </param>
         /// <param name="platform">
         /// The platform <paramref name="uuids"/> belong to.
@@ -203,7 +203,7 @@ namespace R6Sharp
         /// Get objective-specific information, such as hostage rescue or secure area, on players.
         /// </summary>
         /// <param name="uuids">
-        /// The UUIDs matching the player profiles (should be searched with <see cref="SearchProfileAsync(string, Platform)"/> beforehand).
+        /// The UUIDs matching the player profiles (should be searched with <see cref="GetProfileAsync(string, Platform)"/> beforehand).
         /// </param>
         /// <param name="platform">
         /// The platform <paramref name="uuids"/> belong to.
@@ -211,22 +211,22 @@ namespace R6Sharp
         /// <returns>
         /// A dictionary of players with players' UUIDs as key and objectives as values.
         /// </returns>
-        public async Task<Dictionary<string, ObjectiveStatistic>> GetObjectiveStatisticsAsync(Guid[] uuids, Platform platform)
+        public async Task<Dictionary<string, Objective>> GetObjectiveStatisticsAsync(Guid[] uuids, Platform platform)
         {
-            var results = await FetchStatisticsAsync<ObjectiveStatisticFetch>(uuids, platform, Constant.ObjectiveStatisticsVariables).ConfigureAwait(false);
-            return results.Players;
+            var results = await FetchStatisticsAsync<ObjectiveFetch>(uuids, platform, Constant.ObjectiveStatisticsVariables).ConfigureAwait(false);
+            return results.Objectives;
         }
         #endregion
 
         #region Overloading Methods
-        public async Task<Profile> SearchProfileAsync(string player, Platform platform)
+        public async Task<Profile> GetProfileAsync(string player, Platform platform)
         {
             var profiles = await SearchProfileAsync(new string[] { player }, platform).ConfigureAwait(false);
             // the search result could contain more than one result, return first anyways
             return profiles.Count > 0 ? profiles[0] : null;
         }
 
-        public async Task<PlayerProgression> GetProfileAsync(Guid uuid, Platform platform)
+        public async Task<PlayerProgression> GetProgressionAsync(Guid uuid, Platform platform)
         {
             var profiles = await GetProfileAsync(new[] { uuid }, platform).ConfigureAwait(false);
             return profiles.Count > 0 ? profiles[0] : null;
@@ -252,7 +252,7 @@ namespace R6Sharp
             return await GetStatisticsAsync(new[] { uuid }, platform, allStats).ConfigureAwait(false);
         }
 
-        public async Task<Dictionary<string, ObjectiveStatistic>> GetObjectiveStatisticsAsync(Guid uuid, Platform platform)
+        public async Task<Dictionary<string, Objective>> GetObjectiveStatisticsAsync(Guid uuid, Platform platform)
         {
             return await GetObjectiveStatisticsAsync(new[] { uuid }, platform).ConfigureAwait(false);
         }

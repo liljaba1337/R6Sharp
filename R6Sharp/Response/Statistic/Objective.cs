@@ -3,13 +3,13 @@ using System.Text.Json.Serialization;
 
 namespace R6Sharp.Response.Statistic
 {
-    public class ObjectiveStatisticFetch
+    public class ObjectiveFetch
     {
         [JsonPropertyName("results")]
-        public Dictionary<string, ObjectiveStatistic> Players { get; set; }
+        public Dictionary<string, Objective> Objectives { get; set; }
     }
 
-    public class ObjectiveStatistic
+    public class Objective
     {
         [JsonPropertyName("secureareapvp_matchwon:infinite")]
         public int SecureAreaMatchWon { get; set; }
