@@ -68,31 +68,17 @@ namespace R6Sharp
 
         private static string[] GetVariables(StatisticsType statisticsType)
         {
-            var line = string.Empty;
-            switch (statisticsType)
+            string line = statisticsType switch
             {
-                case StatisticsType.All:
-                    line = AllStatisticsVariables;
-                    break;
-                case StatisticsType.Core:
-                    line = CoreStatisticsVariables;
-                    break;
-                case StatisticsType.Firefight:
-                    line = FirefightStatisticsVariables;
-                    break;
-                case StatisticsType.Operator:
-                    line = OperatorStatisticsVariables;
-                    break;
-                case StatisticsType.General:
-                    line = GeneralStatisticsVariables;
-                    break;
-                case StatisticsType.Queue:
-                    line = QueueStatisticsVariables;
-                    break;
-                case StatisticsType.Objective:
-                    line = ObjectiveStatisticsVariables;
-                    break;
-            }
+                StatisticsType.All => AllStatisticsVariables,
+                StatisticsType.Core => CoreStatisticsVariables,
+                StatisticsType.Firefight => FirefightStatisticsVariables,
+                StatisticsType.Operator => OperatorStatisticsVariables,
+                StatisticsType.General => GeneralStatisticsVariables,
+                StatisticsType.Queue => QueueStatisticsVariables,
+                StatisticsType.Objective => ObjectiveStatisticsVariables,
+                _ => string.Empty,
+            };
             return line.Split(',');
         }
 
