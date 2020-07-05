@@ -94,21 +94,24 @@ namespace R6Sharp.Response.Static
         /// </returns>
         public static async Task<Dictionary<string, string>> GetAllAsync(Language language)
         {
+            // Transform input language to ones Ubisoft uses for localization
+            Language lang;
             switch (language)
             {
                 case Language.AustralianEnglish:
                 case Language.BritishEnglish:
                 case Language.NordicEnglish:
-                    language = Language.AmericanEnglish;
+                    lang = Language.AmericanEnglish;
                     break;
                 case Language.CanadianFrench:
-                    language = Language.EuropeanFrench;
+                    lang = Language.EuropeanFrench;
                     break;
                 default:
+                    lang = language;
                     break;
             }
 
-            var formatted = string.Format(Endpoint.Locales, FromLanguage(language), GetLocaleHash(language));
+            var formatted = string.Format(Endpoint.Locales, FromLanguage(lang), GetLocaleHash(lang));
             return await ApiHelper.GetDataAsync<Dictionary<string, string>>(formatted, null, null, null).ConfigureAwait(false);
         }
     }
