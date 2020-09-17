@@ -99,33 +99,17 @@ namespace R6Sharp.Endpoint
 
         private async Task<Session> GetSessionAsync()
         {
-            bool expired = true;
-            if (_currentSession != null)
+            // Build json for remembering (or not) the user/session
+            byte[] data = Encoding.UTF8.GetBytes($"{{\"rememberMe\": {(RememberMe ? "true" : "false")}}}");
+            // Add authorization header
+            var headervaluepairs = new[]
             {
-                var now = DateTime.UtcNow;
-                if (now < _currentSession.Expiration)
-                {
-                    expired = false;
-                }
-            }
-
-            // If any session expired or doesn't exist (by default)
-            if (expired)
-            {
-                // Build json for remembering (or not) the user/session
-                byte[] data = Encoding.UTF8.GetBytes($"{{\"rememberMe\": {(RememberMe ? "true" : "false")}}}");
-                // Add authorization header
-                var headervaluepairs = new[]
-                {
                     new KeyValuePair<HttpRequestHeader, string>(HttpRequestHeader.Authorization, $"Basic {_credentialsb64}")
                 };
 
-                // Get result from endpoint
-                var response = await ApiHelper.BuildRequestAsync(new Uri(Endpoints.Sessions), headervaluepairs, data, false).ConfigureAwait(false);
-                _currentSession = JsonSerializer.Deserialize<Session>(response);
-            }
-
-            return _currentSession;
+            // Get result from endpoint
+            var response = await ApiHelper.BuildRequestAsync(new Uri(Endpoints.Sessions), headervaluepairs, data, false).ConfigureAwait(false);
+            return JsonSerializer.Deserialize<Session>(response);
         }
     }
 }
