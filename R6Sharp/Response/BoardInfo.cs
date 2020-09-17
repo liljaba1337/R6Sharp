@@ -4,13 +4,13 @@ using System.Text.Json.Serialization;
 
 namespace R6Sharp.Response
 {
-    public class RankedSearch
+    public class BoardInfoFetch
     {
         [JsonPropertyName("players")]
-        public Dictionary<string, Ranked> Players { get; set; }
+        public Dictionary<string, BoardInfo> Players { get; set; }
     }
 
-    public class Ranked
+    public class BoardInfo
     {
         [JsonPropertyName("kills")]
         public int Kills { get; set; }

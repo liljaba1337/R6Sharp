@@ -1,4 +1,6 @@
-﻿using R6Sharp.Response.Static;
+﻿using R6Sharp.Response;
+using R6Sharp.Response.Static;
+using R6Sharp.Response.Statistic;
 using System;
 using System.Buffers;
 using System.Buffers.Text;
@@ -10,6 +12,7 @@ using System.Net.Mime;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace R6Sharp
 {
@@ -88,15 +91,29 @@ namespace R6Sharp
             }
         }
 
-        internal static async Task<T> GetDataAsync<T>(string url, Platform? platform, NameValueCollection queries, string ticket)
+        internal static async Task<string> GetDataAsync(string url, Platform? platform, IEnumerable<KeyValuePair<string, string>> queries, string ticket)
         {
             if (platform != null)
             {
-                url = string.Format(url, Constant.PlatformToGuid(platform ?? default));
+                if (url.Equals(Endpoints.Progressions) || url.Equals(Endpoints.Players) || url.Equals(Endpoints.Statistics))
+                {
+                    url = string.Format(url, Constant.PlatformToGuid(platform ?? default), Constant.PlatformToSandbox(platform ?? default));
+                }
+                else
+                {
+                    url = string.Format(url, Constant.PlatformToGuid(platform ?? default));
+                }
             }
             if (queries != null)
             {
-                url = $"{url}?{queries}";
+                // TO-DO: find a better, more secure way of doing this
+                var completeQueries = new List<string>();
+                foreach (var query in queries)
+                {
+                    completeQueries.Add(string.Join('=', query.Key, query.Value));
+                }
+
+                url = string.Join('?', url, string.Join('&', completeQueries));
             }
 
             var uri = new Uri(url);
@@ -106,8 +123,7 @@ namespace R6Sharp
             {
                 headerValuePairs[0] = new KeyValuePair<HttpRequestHeader, string>(HttpRequestHeader.Authorization, $"Ubi_v1 t={ticket}");
             }
-            var response = await BuildRequestAsync(uri, headerValuePairs, null, true).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<T>(response);
+            return await BuildRequestAsync(uri, headerValuePairs, null, true).ConfigureAwait(false);
         }
 
         internal static async Task<string> BuildRequestAsync(Uri uri, KeyValuePair<HttpRequestHeader, string>[] additionalHeaderValues, byte[] data, bool get)
@@ -141,7 +157,6 @@ namespace R6Sharp
             using (var stream = response.GetResponseStream())
             using (var reader = new StreamReader(stream))
             {
-
                 result = await reader.ReadToEndAsync().ConfigureAwait(false);
             }
 

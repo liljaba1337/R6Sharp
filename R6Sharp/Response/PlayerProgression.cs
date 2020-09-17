@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace R6Sharp.Response
 {
-    public class PlayerProgressionSearch
+    public class PlayerProgressionFetch
     {
         [JsonPropertyName("player_profiles")]
         public List<PlayerProgression> PlayerProgressions { get; set; }

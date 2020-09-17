@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace R6Sharp
+﻿namespace R6Sharp
 {
-    internal static class Endpoint
+    internal static class Endpoints
     {
         // API access
         internal const string Base = "https://game-rainbow6.ubi.com";
@@ -10,9 +8,9 @@ namespace R6Sharp
         internal const string Search = "https://public-ubiservices.ubi.com/v2/profiles";
 
         // These endpoints need to be formatted to correct space uuids (uplay, psn, xbl)
-        internal const string Progressions = "https://public-ubiservices.ubi.com/v1/spaces/{0}/sandboxes/OSBOR_PC_LNCH_A/r6playerprofile/playerprofile/progressions";
-        internal const string Ranked = "https://public-ubiservices.ubi.com/v1/spaces/{0}/sandboxes/OSBOR_PC_LNCH_A/r6karma/players";
-        internal const string Statistics = "https://public-ubiservices.ubi.com/v1/spaces/{0}/sandboxes/OSBOR_PC_LNCH_A/playerstats2/statistics";
+        internal const string Progressions = "https://public-ubiservices.ubi.com/v1/spaces/{0}/sandboxes/{1}/r6playerprofile/playerprofile/progressions";
+        internal const string Players = "https://public-ubiservices.ubi.com/v1/spaces/{0}/sandboxes/{1}/r6karma/players";
+        internal const string Statistics = "https://public-ubiservices.ubi.com/v1/spaces/{0}/sandboxes/{1}/playerstats2/statistics";
 
         // These are metadata endpoints, places where static data is stored
         internal const string Avatar = "https://ubisoft-avatars.akamaized.net/{0}/default_146_146.png?appId={1}";

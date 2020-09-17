@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace R6Sharp.Response.Static
 {
@@ -65,28 +64,6 @@ namespace R6Sharp.Response.Static
 
         [JsonPropertyName("range")]
         public List<int?> Range { get; set; }
-
-        /// <summary>
-        /// Get overall seasons data (season 2 and onwards).
-        /// </summary>
-        /// <returns>
-        /// List of seasons with their respective details like ranks and divisions.
-        /// </returns>
-        public static async Task<List<SeasonDetail>> GetAllAsync()
-        {
-            // Fetch ranked static data
-            var fetch = await ApiHelper.GetDataAsync<RankFetch>(Endpoint.Ranks, null, null, null).ConfigureAwait(false);
-            // Prefix R6 base URL to the images URL so it is ready to use as it is
-            foreach (var season in fetch.Seasons)
-            {
-                foreach (var rank in season.Ranks)
-                {
-                    rank.Images.Default = string.Join('/', Endpoint.Base, rank.Images.Default);
-                    rank.Images.Hd = string.Join('/', Endpoint.Base, rank.Images.Hd);
-                }
-            }    
-            return fetch.Seasons;
-        }
     }
 
     public class Images
