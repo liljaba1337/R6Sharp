@@ -27,7 +27,6 @@ namespace R6Sharp
 
     public class R6Api
     {
-        private readonly SessionEndpoint _session;
         public readonly ProfileEndpoint Profile;
         public readonly PlayerProgressionEndpoint PlayerProgression;
         public readonly PlayerEndpoint Player;
@@ -72,7 +71,7 @@ namespace R6Sharp
                 throw new ArgumentNullException(this.GetType().FullName, "Password cannot be null or empty.");
             }
 
-            _session = new SessionEndpoint(email, password, rememberMe);
+            var _session = new SessionEndpoint(email, password, rememberMe);
             Profile = new ProfileEndpoint(_session);
             PlayerProgression = new PlayerProgressionEndpoint(_session);
             Player = new PlayerEndpoint(_session);

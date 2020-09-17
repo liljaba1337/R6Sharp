@@ -13,22 +13,22 @@ namespace R6Sharp
         Queues
     }
 
-    public static class Constant
+    internal static class Constant
     {
-        public const string EquipmentsStatisticsVariable = GadgetPve + GadgetPvp + WeaponPve +
-                                                           WeaponPvp + WeaponTypePve + WeaponTypePvp;
+        internal const string EquipmentsStatisticsVariable = GadgetPve + GadgetPvp + WeaponPve +
+                                                             WeaponPvp + WeaponTypePve + WeaponTypePvp;
 
-        public const string GamemodesStatisticsVariables = ProtectHostagePve + PlantBombPve + PlantBombPvp +
-                                                           RescueHostagePve + RescueHostagePvp + SecureAreaPve +
-                                                           SecureAreaPvp;
+        internal const string GamemodesStatisticsVariables = ProtectHostagePve + PlantBombPve + PlantBombPvp +
+                                                             RescueHostagePve + RescueHostagePvp + SecureAreaPve +
+                                                             SecureAreaPvp;
 
-        public const string OperatorsStatisticsVariables = OperatorPve + OperatorPvp;
+        internal const string OperatorsStatisticsVariables = OperatorPve + OperatorPvp;
 
-        public const string QueuesStatisticsVariables = GeneralPve + GeneralPvp + NormalPvp +
-                                                        CasualPvp + RankedPvp + CustomPvp;
+        internal const string QueuesStatisticsVariables = GeneralPve + GeneralPvp + NormalPvp +
+                                                          CasualPvp + RankedPvp + CustomPvp;
 
-        public const string TerroristHuntMissionsStatisticsVariables = AllTerroHunt + TerroHuntClassic + MissionSolo +
-                                                                       MissionCoop + MissionsByPlaylist;
+        internal const string TerroristHuntMissionsStatisticsVariables = AllTerroHunt + TerroHuntClassic + MissionSolo +
+                                                                         MissionCoop + MissionsByPlaylist;
 
         // General and queues
         private const string GeneralPve = "generalpve_accuracy,generalpve_barricadedeployed,generalpve_blindkills,generalpve_bulletfired,generalpve_bullethit,generalpve_dbno,generalpve_dbnoassists,generalpve_death,generalpve_death:infinite,generalpve_distancetravelled,generalpve_gadgetdestroy,generalpve_headshot,generalpve_hostagedefense,generalpve_hostagerescue,generalpve_kdratio,generalpve_killassists,generalpve_kills,generalpve_kills:infinite,generalpve_matchlost,generalpve_matchlost:infinite,generalpve_matchplayed,generalpve_matchplayed:infinite,generalpve_matchwlratio,generalpve_matchwon,generalpve_matchwon:infinite,generalpve_meleekills,generalpve_penetrationkills,generalpve_rappelbreach,generalpve_reinforcementdeploy,generalpve_revive,generalpve_revivedenied,generalpve_serveraggression,generalpve_serverdefender,generalpve_servershacked,generalpve_suicide,generalpve_timeplayed,generalpve_timeplayed:infinite,generalpve_totalxp";

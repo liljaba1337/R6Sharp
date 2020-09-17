@@ -80,7 +80,7 @@ namespace R6Sharp.Endpoint
                     else
                     {
                         // Error is unknown, rethrow it
-                        throw e;
+                        throw;
                     }
                 }
             }
