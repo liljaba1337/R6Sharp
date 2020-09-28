@@ -39,12 +39,12 @@ namespace R6Sharp.Endpoint
         public async Task<string> GetTicketAsync()
         {
             var sessionFileName = "session.json";
+            var now = DateTime.UtcNow;
             var requestNewSession = false;
             // If Session exists in memory, check if it has expired
             if (_currentSession != null)
             {
-                var now = DateTime.UtcNow;
-                if (now >= _currentSession.Expiration)
+                if (!ValidateSession(now, _currentSession.Expiration))
                 {
                     // Session expired, get new session
                     requestNewSession = true;
@@ -59,7 +59,7 @@ namespace R6Sharp.Endpoint
                     var loadedSession = JsonSerializer.Deserialize<Session>(json);
 
                     // If Session was readable and there is time before expiration
-                    if (loadedSession != null && DateTime.UtcNow < loadedSession.Expiration)
+                    if (loadedSession != null && ValidateSession(now, loadedSession.Expiration))
                     {
                         // Use the loaded session
                         _currentSession = loadedSession;
@@ -95,6 +95,14 @@ namespace R6Sharp.Endpoint
             }
 
             return _currentSession.Ticket;
+        }
+
+        private bool ValidateSession(DateTime nowUtc, DateTime expirationUtc)
+        {
+            // Check if there is one minute left until expiration
+            // TO-DO: One minute is arbitrary, maybe use error 401 to detect
+            // session expiration for edge cases
+            return nowUtc.AddMinutes(1) <= expirationUtc;
         }
 
         private async Task<Session> GetSessionAsync()
