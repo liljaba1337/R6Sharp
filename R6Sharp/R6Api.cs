@@ -1,7 +1,5 @@
 ﻿using R6Sharp.Endpoint;
 using System;
-using System.Threading.Tasks;
-using System.Web;
 
 namespace R6Sharp
 {

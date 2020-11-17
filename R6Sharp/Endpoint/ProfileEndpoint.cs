@@ -23,7 +23,7 @@ namespace R6Sharp.Endpoint
         /// The player names to search for.
         /// </param>
         /// <param name="platform">
-        /// The platform the player is on.d
+        /// The platform the player is on.
         /// </param>
         /// <returns>
         /// A list of players that matched the terms.

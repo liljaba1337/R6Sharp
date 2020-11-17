@@ -1,18 +1,14 @@
-﻿using R6Sharp.Response;
-using R6Sharp.Response.Static;
-using R6Sharp.Response.Statistic;
+﻿using R6Sharp.Response.Static;
 using System;
 using System.Buffers;
 using System.Buffers.Text;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
 using System.Net;
 using System.Net.Mime;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace R6Sharp
 {

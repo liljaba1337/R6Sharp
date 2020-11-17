@@ -1,4 +1,5 @@
 ﻿using R6Sharp.Response.Static;
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -122,6 +123,7 @@ namespace R6Sharp.Endpoint
         /// <returns>
         /// List of seasons with their respective details like ranks and divisions.
         /// </returns>
+        [Obsolete]
         public async Task<List<SeasonDetail>> GetSeasonDetailsAsync()
         {
             // Fetch ranked static data
@@ -145,6 +147,7 @@ namespace R6Sharp.Endpoint
         /// <returns>
         /// Latest season and dictionary of seasons with their respective names and URL to season background.
         /// </returns>
+        [Obsolete]
         public async Task<SeasonsInfo> GetSeasonsInfoAsync()
         {
             var results = await ApiHelper.GetDataAsync(Endpoints.Seasons, null, null, null).ConfigureAwait(false);
@@ -160,6 +163,7 @@ namespace R6Sharp.Endpoint
         /// <returns>
         /// Season details.
         /// </returns>
+        [Obsolete]
         public async Task<Season> GetSeasonAsync(int id)
         {
             var info = await GetSeasonsInfoAsync().ConfigureAwait(false);
@@ -169,6 +173,7 @@ namespace R6Sharp.Endpoint
         }
 
         /// <inheritdoc/>
+        [Obsolete]
         public async Task<Season> GetSeasonAsync()
         {
             return await GetSeasonAsync(-1).ConfigureAwait(false);
