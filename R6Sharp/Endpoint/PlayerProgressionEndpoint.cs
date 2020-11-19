@@ -34,8 +34,8 @@ namespace R6Sharp.Endpoint
                 new KeyValuePair<string, string>("profile_ids", string.Join(',', uuids))
             };
 
-            var ticket = await _sessionHandler.GetTicketAsync().ConfigureAwait(false);
-            var results = await ApiHelper.GetDataAsync(Endpoints.Progressions, platform, queries, ticket).ConfigureAwait(false);
+            var session = await _sessionHandler.GetCurrentSessionAsync().ConfigureAwait(false);
+            var results = await ApiHelper.GetDataAsync(Endpoints.Progressions, platform, queries, session).ConfigureAwait(false);
             var deserialised = JsonSerializer.Deserialize<PlayerProgressionFetch>(results);
             foreach (var result in deserialised.PlayerProgressions)
             {

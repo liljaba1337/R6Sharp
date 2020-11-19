@@ -36,8 +36,8 @@ namespace R6Sharp.Endpoint
                 new KeyValuePair<string, string>("platformType", Constant.PlatformToString(platform))
             };
 
-            var ticket = await _sessionHandler.GetTicketAsync().ConfigureAwait(false);
-            var results = await ApiHelper.GetDataAsync(Endpoints.Search, null, queries, ticket).ConfigureAwait(false);
+            var session = await _sessionHandler.GetCurrentSessionAsync().ConfigureAwait(false);
+            var results = await ApiHelper.GetDataAsync(Endpoints.Search, null, queries, session).ConfigureAwait(false);
             var deserialised = JsonSerializer.Deserialize<ProfileSearch>(results);
             return deserialised.Profiles;
         }
@@ -58,8 +58,8 @@ namespace R6Sharp.Endpoint
                 new KeyValuePair<string, string>("platformType", Constant.PlatformToString(platform))
             };
 
-            var ticket = await _sessionHandler.GetTicketAsync().ConfigureAwait(false);
-            var results = await ApiHelper.GetDataAsync(Endpoints.Search, null, queries, ticket).ConfigureAwait(false);
+            var session = await _sessionHandler.GetCurrentSessionAsync().ConfigureAwait(false);
+            var results = await ApiHelper.GetDataAsync(Endpoints.Search, null, queries, session).ConfigureAwait(false);
             var deserialised = JsonSerializer.Deserialize<ProfileSearch>(results);
             return deserialised.Profiles;
         }

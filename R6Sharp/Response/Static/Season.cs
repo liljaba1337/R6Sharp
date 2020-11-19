@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using static R6Sharp.Parser;
 
 namespace R6Sharp.Response.Static
 {
@@ -10,7 +11,7 @@ namespace R6Sharp.Response.Static
         public Dictionary<string, Season> Seasons { get; set; }
 
         [JsonPropertyName("latestSeason")]
-        [JsonConverter(typeof(ApiHelper.ParseStringToInt))]
+        [JsonConverter(typeof(ParseStringToInt))]
         public int LatestSeason { get; set; }
     }
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using static R6Sharp.Parser;
 
 namespace R6Sharp.Response.Static
 {
@@ -38,7 +39,7 @@ namespace R6Sharp.Response.Static
     public class Division
     {
         [JsonPropertyName("id")]
-        [JsonConverter(typeof(ApiHelper.ParseStringToId))]
+        [JsonConverter(typeof(ParseStringToId))]
         public RankId Id { get; set; }
 
         [JsonPropertyName("name")]

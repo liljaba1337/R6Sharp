@@ -8,6 +8,7 @@ namespace R6Sharp
     /// </summary>
     public enum Region
     {
+        All,    // Unified regions
         APAC,   // Asia Pacific :(
         EMEA,   // Europe, Middle East and Africa
         NCSA    // North, Central and South America
@@ -16,11 +17,24 @@ namespace R6Sharp
     /// <summary>
     /// Platform the player is based on.
     /// </summary>
+    [Flags]
     public enum Platform
     {
-        Uplay,  // Uplay
-        PSN,    // Playstation Network
-        XBL     // Xbox Live
+        PC = 1,     // PC/Uplay
+        PSN = 2,    // Playstation Network
+        XBL = 4     // Xbox Live
+    }
+
+    /// <summary>
+    /// Gamemode data to retrieve for player.
+    /// </summary>
+    [Flags]
+    public enum Gamemode
+    {
+        Casual = 1,
+        Unranked = 2,
+        Ranked = 4,
+        All = 8
     }
 
     public class R6Api
@@ -30,6 +44,12 @@ namespace R6Sharp
         public readonly PlayerEndpoint Player;
         public readonly StatisticEndpoint Statistic;
         public readonly StaticEndpoint Static;
+
+        public readonly SummaryEndpoint Summary;
+        //public readonly WeaponEndpoint Weapon;
+        //public readonly OperatorEndpoint Operator;
+        //public readonly MapEndpoint Map;
+        //public readonly TrendEndpoint Trend;
 
         #region Constructors
         /// <summary>
@@ -75,6 +95,8 @@ namespace R6Sharp
             Player = new PlayerEndpoint(_session);
             Statistic = new StatisticEndpoint(_session);
             Static = new StaticEndpoint();
+
+            Summary = new SummaryEndpoint(_session);
         }
         #endregion
     }

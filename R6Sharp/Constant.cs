@@ -118,7 +118,7 @@ namespace R6Sharp
             return Platform switch
             {
                 Platform.PSN => "psn",
-                Platform.Uplay => "uplay",
+                Platform.PC => "uplay",
                 Platform.XBL => "xbl",
                 _ => throw new Exception("Platform does not exist.")
             };
@@ -140,9 +140,32 @@ namespace R6Sharp
             return Platform switch
             {
                 Platform.PSN => PSN,
-                Platform.Uplay => Uplay,
+                Platform.PC => Uplay,
                 Platform.XBL => XBL,
                 _ => throw new Exception("Platform does not exist."),
+            };
+        }
+
+        internal static string GamemodeToString(Gamemode gamemode)
+        {
+            return gamemode switch
+            {
+                Gamemode.All => "all",
+                Gamemode.Ranked => "ranked",
+                Gamemode.Unranked => "unranked",
+                Gamemode.Casual => "casual",
+                _ => throw new Exception("Gamemode does not exist")
+            };
+        }
+
+        internal static string PlatformToName(Platform platform)
+        {
+            return platform switch
+            {
+                Platform.PC => "PC",
+                Platform.PSN => "PS4",
+                Platform.XBL => "XONE",
+                _ => throw new Exception("New platform does not exist."),
             };
         }
 
@@ -151,7 +174,7 @@ namespace R6Sharp
             return platform switch
             {
                 Platform.PSN => "OSBOR_PS4_LNCH_A",
-                Platform.Uplay => "OSBOR_PC_LNCH_A",
+                Platform.PC => "OSBOR_PC_LNCH_A",
                 Platform.XBL => "OSBOR_XBOXONE_LNCH_A",
                 _ => throw new Exception("Platform does not exist."),
             };

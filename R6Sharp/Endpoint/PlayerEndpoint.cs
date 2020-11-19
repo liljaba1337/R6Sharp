@@ -43,8 +43,8 @@ namespace R6Sharp.Endpoint
                 new KeyValuePair<string, string>("season_id", season.ToString())
             };
 
-            var ticket = await _sessionHandler.GetTicketAsync().ConfigureAwait(false);
-            var results = await ApiHelper.GetDataAsync(Endpoints.Players, platform, queries, ticket).ConfigureAwait(false);
+            var session = await _sessionHandler.GetCurrentSessionAsync().ConfigureAwait(false);
+            var results = await ApiHelper.GetDataAsync(Endpoints.Players, platform, queries, session).ConfigureAwait(false);
             var deserialised = JsonSerializer.Deserialize<BoardInfoFetch>(results);
             return deserialised.Players;
         }
@@ -77,8 +77,8 @@ namespace R6Sharp.Endpoint
                 new KeyValuePair<string, string>("season_id", season.ToString())
             };
 
-            var ticket = await _sessionHandler.GetTicketAsync().ConfigureAwait(false);
-            var results = await ApiHelper.GetDataAsync(Endpoints.Players, platform, queries, ticket).ConfigureAwait(false);
+            var session = await _sessionHandler.GetCurrentSessionAsync().ConfigureAwait(false);
+            var results = await ApiHelper.GetDataAsync(Endpoints.Players, platform, queries, session).ConfigureAwait(false);
             var deserialised = JsonSerializer.Deserialize<BoardInfoFetch>(results);
             return deserialised.Players;
         }

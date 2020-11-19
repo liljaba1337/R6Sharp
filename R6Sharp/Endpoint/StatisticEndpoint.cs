@@ -102,8 +102,8 @@ namespace R6Sharp.Endpoint
                 new KeyValuePair<string, string>("statistics", string.Join(',', variables))
             };
 
-            var ticket = await _sessionHandler.GetTicketAsync().ConfigureAwait(false);
-            var results = await ApiHelper.GetDataAsync(Endpoints.Statistics, platform, queries, ticket).ConfigureAwait(false);
+            var session = await _sessionHandler.GetCurrentSessionAsync().ConfigureAwait(false);
+            var results = await ApiHelper.GetDataAsync(Endpoints.Statistics, platform, queries, session).ConfigureAwait(false);
             return results;
         }
     }
