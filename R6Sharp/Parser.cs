@@ -1,4 +1,5 @@
-﻿using R6Sharp.Response;
+﻿using R6Sharp.Exceptions;
+using R6Sharp.Response;
 using R6Sharp.Response.Static;
 using System;
 using System.Buffers;
@@ -104,16 +105,23 @@ namespace R6Sharp
             }
         }
 
-        internal class ParseStringToStatisticType : JsonConverter<StatisticType>
+        internal class ParseStringToDataResponseType : JsonConverter<DataResponseType>
         {
-            public override StatisticType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            public override DataResponseType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
             {
-                var region = reader.GetString();
-                region = char.ToUpper(region[0]) + region[1..];
-                return Enum.Parse<StatisticType>(region);
+                var type = reader.GetString();
+                return type switch
+                {
+                    "maps" => DataResponseType.Maps,
+                    "operators" => DataResponseType.Operators,
+                    "summary" => DataResponseType.Summary,
+                    "trend" => DataResponseType.Trend,
+                    "weapons" => DataResponseType.Weapons,
+                    _ => throw new UnrecognizedDataException($"Could not recognize \"{type}\" as {typeof(DataResponseType).Name}."),
+                };
             }
 
-            public override void Write(Utf8JsonWriter writer, StatisticType value, JsonSerializerOptions options)
+            public override void Write(Utf8JsonWriter writer, DataResponseType value, JsonSerializerOptions options)
             {
                 writer.WriteStringValue(value.ToString());
             }
@@ -128,6 +136,25 @@ namespace R6Sharp
             }
 
             public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
+            {
+                writer.WriteStringValue(value.ToString());
+            }
+        }
+
+        internal class ParseStringToRoleType : JsonConverter<RoleType>
+        {
+            public override RoleType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            {
+                var type = reader.GetString();
+                return type switch
+                {
+                    "Team roles" => RoleType.TeamRoles,
+                    "Team roles weapons" => RoleType.TeamRolesWeapons,
+                    _ => throw new UnrecognizedDataException($"Could not recognize \"{type}\" as {typeof(RoleType).Name}."),
+                };
+            }
+
+            public override void Write(Utf8JsonWriter writer, RoleType value, JsonSerializerOptions options)
             {
                 writer.WriteStringValue(value.ToString());
             }

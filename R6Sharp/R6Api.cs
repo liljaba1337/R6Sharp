@@ -42,7 +42,6 @@ namespace R6Sharp
         public readonly ProfileEndpoint Profile;
         public readonly PlayerProgressionEndpoint PlayerProgression;
         public readonly PlayerEndpoint Player;
-        public readonly StatisticEndpoint Statistic;
         public readonly StaticEndpoint Static;
 
         public readonly SummaryEndpoint Summary;
@@ -93,7 +92,6 @@ namespace R6Sharp
             Profile = new ProfileEndpoint(_session);
             PlayerProgression = new PlayerProgressionEndpoint(_session);
             Player = new PlayerEndpoint(_session);
-            Statistic = new StatisticEndpoint(_session);
             Static = new StaticEndpoint();
 
             Summary = new SummaryEndpoint(_session);
