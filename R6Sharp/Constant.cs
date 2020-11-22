@@ -45,6 +45,7 @@ namespace R6Sharp
         private const string RescueHostagePve = "rescuehostagepve_bestscore,rescuehostagepve_hostagedefense,rescuehostagepve_hostagerescue,rescuehostagepve_matchlost,rescuehostagepve_matchplayed,rescuehostagepve_matchwlratio,rescuehostagepve_matchwon,rescuehostagepve_timeplayed";
         private const string RescueHostagePvp = "rescuehostagepvp_bestscore,rescuehostagepvp_matchlost,rescuehostagepvp_matchplayed,rescuehostagepvp_matchwlratio,rescuehostagepvp_matchwon,rescuehostagepvp_totalxp";
         private const string SecureAreaPve = "secureareapve_bestscore,secureareapve_matchlost,secureareapve_matchplayed,secureareapve_matchwlratio,secureareapve_matchwon,secureareapve_serveraggression,secureareapve_serverdefender,secureareapve_servershacked,secureareapve_timeplayed";
+
         private const string SecureAreaPvp = "secureareapvp_bestscore,secureareapvp_matchlost,secureareapvp_matchplayed,secureareapvp_matchwlratio,secureareapvp_matchwon,secureareapvp_totalxp";
 
         // Terrorist Hunt/Training Grounds and missions
@@ -177,6 +178,17 @@ namespace R6Sharp
                 Platform.PC => "OSBOR_PC_LNCH_A",
                 Platform.XBL => "OSBOR_XBOXONE_LNCH_A",
                 _ => throw new Exception("Platform does not exist."),
+            };
+        }
+
+        internal static string TeamRoleToString(TeamRole teamrole)
+        {
+            return teamrole switch
+            {
+                TeamRole.All => "all",
+                TeamRole.Attacker => "attacker",
+                TeamRole.Defender => "defender",
+                _ => throw new Exception("Team role does not exist."),
             };
         }
     }

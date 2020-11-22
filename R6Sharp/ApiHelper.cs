@@ -117,5 +117,14 @@ namespace R6Sharp
             if (platform.HasFlag(Platform.XBL)) platforms.Add(Constant.PlatformToName(Platform.XBL));
             return string.Join(',', platforms);
         }
+
+        internal static string DeriveTeamRoleFlags(TeamRole teamrole)
+        {
+            var teamroles = new List<string>();
+            if (teamrole.HasFlag(TeamRole.All)) teamroles.Add(Constant.TeamRoleToString(TeamRole.All));
+            if (teamrole.HasFlag(TeamRole.Attacker)) teamroles.Add(Constant.TeamRoleToString(TeamRole.Attacker));
+            if (teamrole.HasFlag(TeamRole.Defender)) teamroles.Add(Constant.TeamRoleToString(TeamRole.Defender));
+            return string.Join(',', teamroles);
+        }
     }
 }

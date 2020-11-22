@@ -37,6 +37,14 @@ namespace R6Sharp
         All = 8
     }
 
+    [Flags]
+    public enum TeamRole
+    {
+        All = 1,
+        Attacker = 2,
+        Defender = 4
+    }
+
     public class R6Api
     {
         public readonly ProfileEndpoint Profile;
@@ -45,9 +53,9 @@ namespace R6Sharp
         public readonly StaticEndpoint Static;
 
         public readonly SummaryEndpoint Summary;
-        //public readonly WeaponEndpoint Weapon;
-        //public readonly OperatorEndpoint Operator;
-        //public readonly MapEndpoint Map;
+        public readonly WeaponEndpoint Weapon;
+        public readonly OperatorEndpoint Operator;
+        public readonly MapEndpoint Map;
         //public readonly TrendEndpoint Trend;
 
         #region Constructors
@@ -95,6 +103,9 @@ namespace R6Sharp
             Static = new StaticEndpoint();
 
             Summary = new SummaryEndpoint(_session);
+            Weapon = new WeaponEndpoint(_session);
+            Operator = new OperatorEndpoint(_session);
+            Map = new MapEndpoint(_session);
         }
         #endregion
     }

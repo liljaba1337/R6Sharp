@@ -37,12 +37,15 @@ namespace Example
 
             var username = "Pseudosin";
             var platform = Platform.PC;
-
             var gamemodes = Gamemode.Casual | Gamemode.Unranked | Gamemode.Ranked | Gamemode.All;
+            var from = new DateTime(2020, 7, 24);
+            var to = new DateTime(2020, 11, 21);
 
             var profile = api.Profile.GetProfileAsync(username, platform).Result;
-            var data = api.Summary.GetSummaryAsync(profile.UserId, gamemodes, platform, new DateTime(2020, 11, 15), new DateTime(2020, 11, 15)).Result;
-            Console.WriteLine(data.ProfileId);
+            var summary = api.Summary.GetSummaryAsync(profile.UserId, gamemodes, platform, from, to).Result;
+            var weapons = api.Weapon.GetWeaponAsync(profile.UserId, gamemodes, platform, TeamRole.All, from, to).Result;
+            var operators = api.Operator.GetOperatorAsync(profile.UserId, gamemodes, platform, TeamRole.Attacker | TeamRole.Defender, from, to).Result;
+            Console.WriteLine(profile.ProfileId);
         }
     }
 }
