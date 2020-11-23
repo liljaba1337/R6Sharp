@@ -105,23 +105,23 @@ namespace R6Sharp
             }
         }
 
-        internal class ParseStringToDataResponseType : JsonConverter<DataResponseType>
+        internal class ParseStringToDataTypeType : JsonConverter<DataType>
         {
-            public override DataResponseType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            public override DataType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
             {
                 var type = reader.GetString();
                 return type switch
                 {
-                    "maps" => DataResponseType.Maps,
-                    "operators" => DataResponseType.Operators,
-                    "summary" => DataResponseType.Summary,
-                    "trend" => DataResponseType.Trend,
-                    "weapons" => DataResponseType.Weapons,
-                    _ => throw new UnrecognizedDataException($"Could not recognize \"{type}\" as {typeof(DataResponseType).Name}."),
+                    "maps" => DataType.Maps,
+                    "operators" => DataType.Operators,
+                    "summary" => DataType.Summary,
+                    "trend" => DataType.Trend,
+                    "weapons" => DataType.Weapons,
+                    _ => throw new UnrecognizedDataException($"Could not recognize \"{type}\" as {typeof(DataType).Name}."),
                 };
             }
 
-            public override void Write(Utf8JsonWriter writer, DataResponseType value, JsonSerializerOptions options)
+            public override void Write(Utf8JsonWriter writer, DataType value, JsonSerializerOptions options)
             {
                 writer.WriteStringValue(value.ToString());
             }
@@ -155,6 +155,24 @@ namespace R6Sharp
             }
 
             public override void Write(Utf8JsonWriter writer, RoleType value, JsonSerializerOptions options)
+            {
+                writer.WriteStringValue(value.ToString());
+            }
+        }
+
+        internal class ParseStringToSpecificDataTypeType : JsonConverter<SpecificDataType>
+        {
+            public override SpecificDataType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            {
+                var type = reader.GetString();
+                return type switch
+                {
+                    "Generalized" => SpecificDataType.Generalized,
+                    _ => throw new UnrecognizedDataException($"Could not recognize \"{type}\" as {typeof(RoleType).Name}."),
+                };
+            }
+
+            public override void Write(Utf8JsonWriter writer, SpecificDataType value, JsonSerializerOptions options)
             {
                 writer.WriteStringValue(value.ToString());
             }

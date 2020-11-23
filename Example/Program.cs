@@ -42,10 +42,9 @@ namespace Example
             var to = new DateTime(2020, 11, 21);
 
             var profile = api.Profile.GetProfileAsync(username, platform).Result;
-            var summary = api.Summary.GetSummaryAsync(profile.UserId, gamemodes, platform, from, to).Result;
-            var weapons = api.Weapon.GetWeaponAsync(profile.UserId, gamemodes, platform, TeamRole.All, from, to).Result;
-            var operators = api.Operator.GetOperatorAsync(profile.UserId, gamemodes, platform, TeamRole.Attacker | TeamRole.Defender, from, to).Result;
-            var maps = api.Map.GetMapAsync(profile.UserId, gamemodes, platform, TeamRole.All | TeamRole.Attacker | TeamRole.Defender, from, to).Result;
+            var summary = api.GetSummaryAsync(profile.UserId, gamemodes, platform, from, to).Result;
+            var operators = api.GetOperatorAsync(profile.UserId, gamemodes, platform, TeamRole.Attacker | TeamRole.Defender, from, to).Result;
+            var maps = api.GetMapAsync(profile.UserId, gamemodes, platform, TeamRole.All | TeamRole.Attacker | TeamRole.Defender, from, to).Result;
             Console.WriteLine(profile.ProfileId);
         }
     }

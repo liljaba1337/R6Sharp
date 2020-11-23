@@ -3,20 +3,20 @@
     internal static class UbiconnectEndpoint
     {
         // ?gameMode=all,ranked,unranked,casual&platform=PC&startDate=20200718&endDate=20201115
-        internal const string Summary = "https://r6s-stats.ubisoft.com/v1/current/summary/{0}";
+        internal const string Summary =     "https://r6s-stats.ubisoft.com/v1/current/summary/{0}";
         // ?gameMode=all,ranked,unranked,casual&platform=PC&teamRole=all&startDate=20200718&endDate=20201115
-        internal const string Weapon = "https://r6s-stats.ubisoft.com/v1/current/summary/{0}";
+        internal const string Weapon =      "https://r6s-stats.ubisoft.com/v1/current/weapons/{0}";
         // teamRole=all?
         // ?gameMode=all,ranked,unranked,casual&platform=PC&teamRole=attacker,defender&startDate=20200718&endDate=20201115
-        internal const string Operator = "https://r6s-stats.ubisoft.com/v1/current/summary/{0}";
+        internal const string Operator =    "https://r6s-stats.ubisoft.com/v1/current/operators/{0}";
         // ?gameMode=all,ranked,unranked,casual&platform=PC&teamRole=all,attacker,defender&startDate=20200718&endDate=20201115
-        internal const string Map = "https://r6s-stats.ubisoft.com/v1/current/summary/{0}";
+        internal const string Map =         "https://r6s-stats.ubisoft.com/v1/current/maps/{0}";
         // ?gameMode=all,ranked,unranked,casual&startDate=20200718&endDate=20201115&teamRole=all,attacker,defender&trendType=weeks
-        internal const string Trend = "https://r6s-stats.ubisoft.com/v1/current/summary/{0}";
+        internal const string Trend =       "https://r6s-stats.ubisoft.com/v1/current/trend/{0}";
         // ?gameMode=all,ranked,unranked,casual&platform=PC
-        internal const string Seasonal = "https://r6s-stats.ubisoft.com/v1/current/summary/{0}";
+        internal const string Seasonal =    "https://r6s-stats.ubisoft.com/v1/seasonal/summary/{0}";
         // ?startDate=20200718&endDate=20201115
-        internal const string Narrative = "https://r6s-stats.ubisoft.com/v1/current/summary/{0}";
+        internal const string Narrative =   "https://r6s-stats.ubisoft.com/v1/narrative/bestmatchweekly/{0}";
     }
 
     internal static class Endpoints
