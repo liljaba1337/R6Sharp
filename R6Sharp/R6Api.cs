@@ -152,11 +152,11 @@ namespace R6Sharp
             return await GetData<DataResponse<TrendStatistics[]>>(Endpoints.Trend, uuid, queries);
         }
 
-        public async Task<DataResponse<Seasonal[]>> GetSeasonalAsync(Guid uuid, Gamemode gamemodes, Platform platforms)
+        public async Task<DataResponse<SeasonalPlayerStatistics[]>> GetSeasonalAsync(Guid uuid, Gamemode gamemodes, Platform platforms)
         {
             // ?gameMode=all,ranked,unranked,casual&platform=PC
             var queries = BuildQuery(gamemodes, null, null, platforms, null, null);
-            return await GetData<DataResponse<Seasonal[]>>(Endpoints.Seasonal, uuid, queries);
+            return await GetData<DataResponse<SeasonalPlayerStatistics[]>>(Endpoints.Seasonal, uuid, queries);
         }
 
         public async Task<Narrative> GetNarrativeAsync(Guid uuid, DateTime start, DateTime end)
