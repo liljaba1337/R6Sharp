@@ -112,7 +112,7 @@ namespace R6Sharp.Endpoint
                     break;
             }
 
-            var formatted = string.Format(Endpoints.Locales, FromLanguage(lang), GetLocaleHash(lang));
+            var formatted = string.Format(Endpoints.Static.Locales, FromLanguage(lang), GetLocaleHash(lang));
             var results = await ApiHelper.GetDataAsync(formatted, null, null, null).ConfigureAwait(false);
             return JsonSerializer.Deserialize<Dictionary<string, string>>(results);
         }
@@ -127,7 +127,7 @@ namespace R6Sharp.Endpoint
         public async Task<List<SeasonDetail>> GetSeasonDetailsAsync()
         {
             // Fetch ranked static data
-            var fetch = await ApiHelper.GetDataAsync(Endpoints.Ranks, null, null, null).ConfigureAwait(false);
+            var fetch = await ApiHelper.GetDataAsync(Endpoints.Static.Ranks, null, null, null).ConfigureAwait(false);
             var deserialized = JsonSerializer.Deserialize<RankFetch>(fetch);
             // Prefix R6 base URL to the images URL so it is ready to use as it is
             foreach (var season in deserialized.Seasons)
@@ -150,7 +150,7 @@ namespace R6Sharp.Endpoint
         [Obsolete]
         public async Task<SeasonsInfo> GetSeasonsInfoAsync()
         {
-            var results = await ApiHelper.GetDataAsync(Endpoints.Seasons, null, null, null).ConfigureAwait(false);
+            var results = await ApiHelper.GetDataAsync(Endpoints.Static.Seasons, null, null, null).ConfigureAwait(false);
             return JsonSerializer.Deserialize<SeasonsInfo>(results);
         }
 

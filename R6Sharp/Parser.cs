@@ -1,6 +1,7 @@
 ﻿using R6Sharp.Exceptions;
 using R6Sharp.Response;
 using R6Sharp.Response.Static;
+using R6Sharp.Response.Statistic;
 using System;
 using System.Buffers;
 using System.Buffers.Text;
@@ -173,6 +174,24 @@ namespace R6Sharp
             }
 
             public override void Write(Utf8JsonWriter writer, SpecificDataType value, JsonSerializerOptions options)
+            {
+                writer.WriteStringValue(value.ToString());
+            }
+        }
+
+        internal class ParseStringToTrendDataTypeType : JsonConverter<TrendDataType>
+        {
+            public override TrendDataType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            {
+                var type = reader.GetString();
+                return type switch
+                {
+                    "Trend Blocks" => TrendDataType.TrendBlocks,
+                    _ => throw new UnrecognizedDataException($"Could not recognize \"{type}\" as {typeof(TrendDataType).Name}."),
+                };
+            }
+
+            public override void Write(Utf8JsonWriter writer, TrendDataType value, JsonSerializerOptions options)
             {
                 writer.WriteStringValue(value.ToString());
             }

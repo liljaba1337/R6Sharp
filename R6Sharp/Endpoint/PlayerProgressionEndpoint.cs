@@ -40,7 +40,7 @@ namespace R6Sharp.Endpoint
             foreach (var result in deserialised.PlayerProgressions)
             {
                 // Attach link to player profile icon url
-                result.ProfileIcon = new Uri(string.Format(Endpoints.Avatar, result.ProfileId, Constant.Rainbow6S));
+                result.ProfileIcon = new Uri(string.Format(Endpoints.Static.Avatar, result.ProfileId, Constant.Rainbow6S));
             }
             return deserialised.PlayerProgressions;
         }

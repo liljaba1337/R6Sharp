@@ -1,5 +1,6 @@
 ﻿using R6Sharp.Endpoint;
 using R6Sharp.Response;
+using R6Sharp.Response.Statistic;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
@@ -109,48 +110,52 @@ namespace R6Sharp
         }
         #endregion
 
-        public async Task<DataResponse> GetSummaryAsync(Guid uuid, Gamemode gamemodes, Platform platforms, DateTime start, DateTime end)
+        public async Task<DataResponse<PlayerStatistics[]>> GetSummaryAsync(Guid uuid, Gamemode gamemodes, Platform platforms, DateTime start, DateTime end)
         {
-            var queries = BuildQuery(gamemodes, platforms, start, end, null, null);
-            return await GetData<DataResponse>(UbiconnectEndpoint.Summary, uuid, queries);
+            var queries = BuildQuery(gamemodes, start, end, platforms, null, null);
+            return await GetData<DataResponse<PlayerStatistics[]>>(Endpoints.Summary, uuid, queries);
         }
 
-        public async Task<DataResponse> GetOperatorAsync(Guid uuid, Gamemode gamemodes, Platform platforms, TeamRole teamroles, DateTime start, DateTime end)
+        public async Task<DataResponse<PlayerStatistics[]>> GetOperatorAsync(Guid uuid, Gamemode gamemodes, Platform platforms, TeamRole teamroles, DateTime start, DateTime end)
         {
-            var queries = BuildQuery(gamemodes, platforms, start, end, teamroles, null);
-            return await GetData<DataResponse>(UbiconnectEndpoint.Operator, uuid, queries);
+            var queries = BuildQuery(gamemodes, start, end, platforms, teamroles, null);
+            return await GetData<DataResponse<PlayerStatistics[]>>(Endpoints.Operator, uuid, queries);
         }
 
-        public async Task<DataResponse> GetMapAsync(Guid uuid, Gamemode gamemodes, Platform platforms, TeamRole teamroles, DateTime start, DateTime end)
+        public async Task<DataResponse<PlayerStatistics[]>> GetMapAsync(Guid uuid, Gamemode gamemodes, Platform platforms, TeamRole teamroles, DateTime start, DateTime end)
         {
-            var queries = BuildQuery(gamemodes, platforms, start, end, teamroles, null);
-            return await GetData<DataResponse>(UbiconnectEndpoint.Map, uuid, queries);
+            var queries = BuildQuery(gamemodes, start, end, platforms, teamroles, null);
+            return await GetData<DataResponse<PlayerStatistics[]>>(Endpoints.Map, uuid, queries);
         }
 
-        public async Task<DataResponse> GetWeaponAsync(Guid uuid, Gamemode gamemodes, Platform platforms, TeamRole teamroles, DateTime start, DateTime end)
+        public async Task<DataResponse<WeaponStatistics>> GetWeaponAsync(Guid uuid, Gamemode gamemodes, Platform platforms, TeamRole teamroles, DateTime start, DateTime end)
         {
-            throw new NotImplementedException();
+            var queries = BuildQuery(gamemodes, start, end, platforms, teamroles, null);
+            return await GetData<DataResponse<WeaponStatistics>>(Endpoints.Weapon, uuid, queries);
         }
 
-        public async Task<DataResponse> GetTrendAsync(Guid uuid, Gamemode gamemodes, DateTime start, DateTime end, TeamRole teamroles, TrendType trendType)
+        public async Task<DataResponse<TrendStatistics[]>> GetTrendAsync(Guid uuid, Gamemode gamemodes, DateTime start, DateTime end, TeamRole teamroles, TrendType trendType)
         {
-            throw new NotImplementedException();
+            var queries = BuildQuery(gamemodes, start, end, null, teamroles, trendType);
+            return await GetData<DataResponse<TrendStatistics[]>>(Endpoints.Trend, uuid, queries);
         }
 
-        private List<KeyValuePair<string, string>> BuildQuery(Gamemode gamemodes,
-                                                              Platform platforms,
-                                                              DateTime start,
-                                                              DateTime end,
-                                                              TeamRole? teamroles,
-                                                              TrendType? trend)
+        private KeyValuePair<string, string>[] BuildQuery(Gamemode gamemodes, DateTime start, DateTime end,
+                                                          Platform? platforms, TeamRole? teamroles, TrendType? trend)
         {
             var queries = new List<KeyValuePair<string, string>>
             {
                 new KeyValuePair<string, string>("gameMode", ApiHelper.DeriveGamemodeFlags(gamemodes)),
-                new KeyValuePair<string, string>("platform", ApiHelper.DerivePlatformFlags(platforms)),
                 new KeyValuePair<string, string>("startDate", start.ToString("yyyyMMdd")),
                 new KeyValuePair<string, string>("endDate", end.ToString("yyyyMMdd"))
             };
+
+            if (platforms.HasValue)
+            {
+                var flags = ApiHelper.DerivePlatformFlags(platforms.Value);
+                var query = new KeyValuePair<string, string>("platform", flags);
+                queries.Add(query);
+            }
 
             if (teamroles.HasValue)
             {
@@ -165,10 +170,10 @@ namespace R6Sharp
                 queries.Add(query);
             }
 
-            return queries;
+            return queries.ToArray();
         }
 
-        private async Task<T> GetData<T>(string endpoint, Guid uuid, List<KeyValuePair<string, string>> queries)
+        private async Task<T> GetData<T>(string endpoint, Guid uuid, KeyValuePair<string, string>[] queries)
         {
             var session = await _session.GetCurrentSessionAsync().ConfigureAwait(false);
             var results = await ApiHelper.GetDataAsync(endpoint, uuid, queries, session).ConfigureAwait(false);

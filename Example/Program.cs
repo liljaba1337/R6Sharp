@@ -42,10 +42,14 @@ namespace Example
             var to = new DateTime(2020, 11, 21);
 
             var profile = api.Profile.GetProfileAsync(username, platform).Result;
-            var summary = api.GetSummaryAsync(profile.UserId, gamemodes, platform, from, to).Result;
-            var operators = api.GetOperatorAsync(profile.UserId, gamemodes, platform, TeamRole.Attacker | TeamRole.Defender, from, to).Result;
-            var maps = api.GetMapAsync(profile.UserId, gamemodes, platform, TeamRole.All | TeamRole.Attacker | TeamRole.Defender, from, to).Result;
-            Console.WriteLine(profile.ProfileId);
+            var uuid = profile.UserId;
+
+            var summary = api.GetSummaryAsync(uuid, gamemodes, platform, from, to).Result;
+            var operators = api.GetOperatorAsync(uuid, gamemodes, platform, TeamRole.Attacker | TeamRole.Defender, from, to).Result;
+            var maps = api.GetMapAsync(uuid, gamemodes, platform, TeamRole.All | TeamRole.Attacker | TeamRole.Defender, from, to).Result;
+            var weapons = api.GetWeaponAsync(uuid, gamemodes, platform, TeamRole.All, from, to).Result;
+            var trends = api.GetTrendAsync(uuid, gamemodes, from, to, TeamRole.All | TeamRole.Attacker | TeamRole.Defender, TrendType.Weeks).Result;
+            Console.WriteLine(uuid);
         }
     }
 }
