@@ -1,4 +1,6 @@
-﻿namespace R6Sharp
+﻿using System;
+
+namespace R6Sharp
 {
     internal static class Endpoints
     {
@@ -10,23 +12,21 @@
         // These endpoints need to be formatted to correct space uuids (uplay, psn, xbl)
         internal const string Progressions = "https://public-ubiservices.ubi.com/v1/spaces/{0}/sandboxes/{1}/r6playerprofile/playerprofile/progressions";
         internal const string Players = "https://public-ubiservices.ubi.com/v1/spaces/{0}/sandboxes/{1}/r6karma/players";
+        [Obsolete]
         internal const string Statistics = "https://public-ubiservices.ubi.com/v1/spaces/{0}/sandboxes/{1}/playerstats2/statistics";
 
-        // ?gameMode=all,ranked,unranked,casual&platform=PC&startDate=20200718&endDate=20201115
+        #region r6s-stats endpoints
+        // These endpoints appear to have started tracking approximately from 16/06/2020 and onwards.
+        // This was manually verified by manually decrementing the data until no changes were detected in data.
+
         internal const string Summary = "https://r6s-stats.ubisoft.com/v1/current/summary/{0}";
-        // ?gameMode=all,ranked,unranked,casual&platform=PC&teamRole=all&startDate=20200718&endDate=20201115
         internal const string Weapon = "https://r6s-stats.ubisoft.com/v1/current/weapons/{0}";
-        // teamRole=all?
-        // ?gameMode=all,ranked,unranked,casual&platform=PC&teamRole=attacker,defender&startDate=20200718&endDate=20201115
         internal const string Operator = "https://r6s-stats.ubisoft.com/v1/current/operators/{0}";
-        // ?gameMode=all,ranked,unranked,casual&platform=PC&teamRole=all,attacker,defender&startDate=20200718&endDate=20201115
         internal const string Map = "https://r6s-stats.ubisoft.com/v1/current/maps/{0}";
-        // ?gameMode=all,ranked,unranked,casual&startDate=20200718&endDate=20201115&teamRole=all,attacker,defender&trendType=weeks
         internal const string Trend = "https://r6s-stats.ubisoft.com/v1/current/trend/{0}";
-        // ?gameMode=all,ranked,unranked,casual&platform=PC
         internal const string Seasonal = "https://r6s-stats.ubisoft.com/v1/seasonal/summary/{0}";
-        // ?startDate=20200718&endDate=20201115
         internal const string Narrative = "https://r6s-stats.ubisoft.com/v1/narrative/bestmatchweekly/{0}";
+        #endregion
 
         // These are metadata endpoints, places where static data is stored
         internal static class Static

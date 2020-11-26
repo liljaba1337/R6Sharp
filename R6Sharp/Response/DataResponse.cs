@@ -7,7 +7,7 @@ namespace R6Sharp.Response
 {
     public enum DataType { Maps, Operators, Summary, Trend, Weapons };
 
-    public enum SpecificDataType { Generalized };
+    public enum SpecificDataType { Generalized, Seasonal };
 
     public enum RoleType { TeamRoles, TeamRolesWeapons };
 

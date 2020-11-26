@@ -42,6 +42,9 @@ namespace R6Sharp
         All = 8
     }
 
+    /// <summary>
+    /// The role the player has played in the matches.
+    /// </summary>
     [Flags]
     public enum TeamRole
     {
@@ -50,6 +53,9 @@ namespace R6Sharp
         Defender = 4
     }
 
+    /// <summary>
+    /// The type of trend to retrieve.
+    /// </summary>
     public enum TrendType
     {
         Weeks
@@ -112,43 +118,79 @@ namespace R6Sharp
 
         public async Task<DataResponse<PlayerStatistics[]>> GetSummaryAsync(Guid uuid, Gamemode gamemodes, Platform platforms, DateTime start, DateTime end)
         {
+            // ?gameMode=all,ranked,unranked,casual&platform=PC&startDate=20200718&endDate=20201115
             var queries = BuildQuery(gamemodes, start, end, platforms, null, null);
             return await GetData<DataResponse<PlayerStatistics[]>>(Endpoints.Summary, uuid, queries);
         }
 
         public async Task<DataResponse<PlayerStatistics[]>> GetOperatorAsync(Guid uuid, Gamemode gamemodes, Platform platforms, TeamRole teamroles, DateTime start, DateTime end)
         {
+            // teamRole=all?
+            // ?gameMode=all,ranked,unranked,casual&platform=PC&teamRole=attacker,defender&startDate=20200718&endDate=20201115
             var queries = BuildQuery(gamemodes, start, end, platforms, teamroles, null);
             return await GetData<DataResponse<PlayerStatistics[]>>(Endpoints.Operator, uuid, queries);
         }
 
         public async Task<DataResponse<PlayerStatistics[]>> GetMapAsync(Guid uuid, Gamemode gamemodes, Platform platforms, TeamRole teamroles, DateTime start, DateTime end)
         {
+            // // ?gameMode=all,ranked,unranked,casual&platform=PC&teamRole=all,attacker,defender&startDate=20200718&endDate=20201115
             var queries = BuildQuery(gamemodes, start, end, platforms, teamroles, null);
             return await GetData<DataResponse<PlayerStatistics[]>>(Endpoints.Map, uuid, queries);
         }
 
         public async Task<DataResponse<WeaponStatistics>> GetWeaponAsync(Guid uuid, Gamemode gamemodes, Platform platforms, TeamRole teamroles, DateTime start, DateTime end)
         {
+            // ?gameMode=all,ranked,unranked,casual&platform=PC&teamRole=all&startDate=20200718&endDate=20201115
             var queries = BuildQuery(gamemodes, start, end, platforms, teamroles, null);
             return await GetData<DataResponse<WeaponStatistics>>(Endpoints.Weapon, uuid, queries);
         }
 
         public async Task<DataResponse<TrendStatistics[]>> GetTrendAsync(Guid uuid, Gamemode gamemodes, DateTime start, DateTime end, TeamRole teamroles, TrendType trendType)
         {
+            // ?gameMode=all,ranked,unranked,casual&startDate=20200718&endDate=20201115&teamRole=all,attacker,defender&trendType=weeks
             var queries = BuildQuery(gamemodes, start, end, null, teamroles, trendType);
             return await GetData<DataResponse<TrendStatistics[]>>(Endpoints.Trend, uuid, queries);
         }
 
-        private KeyValuePair<string, string>[] BuildQuery(Gamemode gamemodes, DateTime start, DateTime end,
+        public async Task<DataResponse<Seasonal[]>> GetSeasonalAsync(Guid uuid, Gamemode gamemodes, Platform platforms)
+        {
+            // ?gameMode=all,ranked,unranked,casual&platform=PC
+            var queries = BuildQuery(gamemodes, null, null, platforms, null, null);
+            return await GetData<DataResponse<Seasonal[]>>(Endpoints.Seasonal, uuid, queries);
+        }
+
+        public async Task<Narrative> GetNarrativeAsync(Guid uuid, DateTime start, DateTime end)
+        {
+            // ?startDate=20200718&endDate=20201115
+            var queries = BuildQuery(null, start, end, null, null, null);
+            return await GetData<Narrative>(Endpoints.Narrative, uuid, queries);
+        }
+
+        private KeyValuePair<string, string>[] BuildQuery(Gamemode? gamemodes, DateTime? start, DateTime? end,
                                                           Platform? platforms, TeamRole? teamroles, TrendType? trend)
         {
-            var queries = new List<KeyValuePair<string, string>>
+            var queries = new List<KeyValuePair<string, string>>();
+
+            if (gamemodes.HasValue)
             {
-                new KeyValuePair<string, string>("gameMode", ApiHelper.DeriveGamemodeFlags(gamemodes)),
-                new KeyValuePair<string, string>("startDate", start.ToString("yyyyMMdd")),
-                new KeyValuePair<string, string>("endDate", end.ToString("yyyyMMdd"))
-            };
+                var flags = ApiHelper.DeriveGamemodeFlags(gamemodes.Value);
+                var query = new KeyValuePair<string, string>("gameMode", flags);
+                queries.Add(query);
+            }
+
+            if (start.HasValue)
+            {
+                var value = start.Value.ToString("yyyyMMdd");
+                var query = new KeyValuePair<string, string>("startDate", value);
+                queries.Add(query);
+            }
+
+            if (end.HasValue)
+            {
+                var value = end.Value.ToString("yyyyMMdd");
+                var query = new KeyValuePair<string, string>("endDate", value);
+                queries.Add(query);
+            }
 
             if (platforms.HasValue)
             {

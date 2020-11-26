@@ -35,11 +35,11 @@ namespace Example
                 Guid.Parse("44444444-4444-4444-4444-444444444444")
             };
 
-            var username = "Pseudosin";
+            var username = "Stefrosmac";
             var platform = Platform.PC;
-            var gamemodes = Gamemode.Casual | Gamemode.Unranked | Gamemode.Ranked | Gamemode.All;
-            var from = new DateTime(2020, 7, 24);
-            var to = new DateTime(2020, 11, 21);
+            var gamemodes = Gamemode.All | Gamemode.Ranked | Gamemode.Unranked | Gamemode.Casual;
+            var from = new DateTime(2016, 06, 16);
+            var to = new DateTime(2020, 11, 26);
 
             var profile = api.Profile.GetProfileAsync(username, platform).Result;
             var uuid = profile.UserId;
@@ -49,6 +49,8 @@ namespace Example
             var maps = api.GetMapAsync(uuid, gamemodes, platform, TeamRole.All | TeamRole.Attacker | TeamRole.Defender, from, to).Result;
             var weapons = api.GetWeaponAsync(uuid, gamemodes, platform, TeamRole.All, from, to).Result;
             var trends = api.GetTrendAsync(uuid, gamemodes, from, to, TeamRole.All | TeamRole.Attacker | TeamRole.Defender, TrendType.Weeks).Result;
+            var seasonal = api.GetSeasonalAsync(uuid, gamemodes, platform).Result;
+            var narrative = api.GetNarrativeAsync(uuid, from, to).Result;
             Console.WriteLine(uuid);
         }
     }

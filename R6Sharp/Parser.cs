@@ -132,7 +132,17 @@ namespace R6Sharp
         {
             public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
             {
-                var date = DateTime.ParseExact(reader.GetInt32().ToString(), "yyyyMMdd", null);
+                string value;
+                if (reader.TokenType == JsonTokenType.String)
+                {
+                    value = reader.GetString();
+                }
+                else
+                {
+                    value = reader.GetInt32().ToString();
+                }
+
+                var date = DateTime.ParseExact(value, "yyyyMMdd", null);
                 return date;
             }
 
@@ -169,6 +179,7 @@ namespace R6Sharp
                 return type switch
                 {
                     "Generalized" => SpecificDataType.Generalized,
+                    "Seasonal" => SpecificDataType.Seasonal,
                     _ => throw new UnrecognizedDataException($"Could not recognize \"{type}\" as {typeof(RoleType).Name}."),
                 };
             }
