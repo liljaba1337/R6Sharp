@@ -22,7 +22,6 @@ namespace R6Sharp
             {
                 if (url.Equals(Endpoints.UbiServices.Progressions) ||
                     url.Equals(Endpoints.UbiServices.Players) ||
-                    url.Equals(Endpoints.UbiServices.Statistics) ||
                     url.Equals(Endpoints.UbiServices.PlayerSkillRecords))
                 {
                     url = string.Format(url, Constant.PlatformToGuid(platform ?? default), Constant.PlatformToSandbox(platform ?? default));

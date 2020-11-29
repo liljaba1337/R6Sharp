@@ -68,7 +68,6 @@ namespace R6Sharp
         public readonly ProfileEndpoint Profile;
         public readonly PlayerProgressionEndpoint PlayerProgression;
         public readonly PlayerEndpoint Player;
-        public readonly StaticEndpoint Static;
         public readonly PlayersSkillRecordsEndpoint PlayersSkillRecordsEndpoint;
 
         #region Constructors
@@ -113,7 +112,6 @@ namespace R6Sharp
             Profile = new ProfileEndpoint(_session);
             PlayerProgression = new PlayerProgressionEndpoint(_session);
             Player = new PlayerEndpoint(_session);
-            Static = new StaticEndpoint();
             PlayersSkillRecordsEndpoint = new PlayersSkillRecordsEndpoint(_session);
         }
         #endregion

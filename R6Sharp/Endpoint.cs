@@ -21,9 +21,6 @@ namespace R6Sharp
                 "https://public-ubiservices.ubi.com/v1/spaces/{0}/sandboxes/{1}/r6karma/players";
             internal const string PlayerSkillRecords =
                 "https://public-ubiservices.ubi.com/v1/spaces/{0}/sandboxes/{1}/r6karma/player_skill_records";
-            [Obsolete]
-            internal const string Statistics =
-                "https://public-ubiservices.ubi.com/v1/spaces/{0}/sandboxes/{1}/playerstats2/statistics";
         }
 
         internal static class R6SStats
@@ -51,21 +48,6 @@ namespace R6Sharp
         {
             internal const string Avatar =
                 "https://ubisoft-avatars.akamaized.net/{0}/default_146_146.png?appId={1}";
-            [Obsolete]
-            internal const string Seasons =
-                "https://game-rainbow6.ubi.com/assets/data/seasons.152c15ea.json";
-            [Obsolete]
-            internal const string Locales =
-                "https://game-rainbow6.ubi.com/assets/locales/locale.{0}.{1}.json";
-            [Obsolete]
-            internal const string Ranks =
-                "https://game-rainbow6.ubi.com/assets/data/ranks.754ab452.json";
-            [Obsolete]
-            internal const string Operators =
-                "https://game-rainbow6.ubi.com/assets/data/operators.f660ac39.json";
-            [Obsolete]
-            internal const string Weapons =
-                "https://game-rainbow6.ubi.com/assets/data/weapons.8a9b3d9e.json";
         }
     }
 }
