@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using R6Sharp.Response.DataResponse;
+using System.Text.Json.Serialization;
 using static R6Sharp.Parser;
 
 namespace R6Sharp.Response.Statistic

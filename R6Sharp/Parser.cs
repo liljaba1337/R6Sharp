@@ -1,4 +1,5 @@
 ﻿using R6Sharp.Exceptions;
+using R6Sharp.Response.DataResponse;
 using R6Sharp.Response.Static;
 using R6Sharp.Response.Statistic;
 using System;
