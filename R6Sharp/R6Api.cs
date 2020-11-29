@@ -69,6 +69,7 @@ namespace R6Sharp
         public readonly PlayerProgressionEndpoint PlayerProgression;
         public readonly PlayerEndpoint Player;
         public readonly StaticEndpoint Static;
+        public readonly PlayersSkillRecordsEndpoint PlayersSkillRecordsEndpoint;
 
         #region Constructors
         /// <summary>
@@ -113,6 +114,7 @@ namespace R6Sharp
             PlayerProgression = new PlayerProgressionEndpoint(_session);
             Player = new PlayerEndpoint(_session);
             Static = new StaticEndpoint();
+            PlayersSkillRecordsEndpoint = new PlayersSkillRecordsEndpoint(_session);
         }
         #endregion
 
@@ -120,7 +122,7 @@ namespace R6Sharp
         {
             // ?gameMode=all,ranked,unranked,casual&platform=PC&startDate=20200718&endDate=20201115
             var queries = BuildQuery(gamemodes, start, end, platforms, null, null);
-            return await GetData<DataResponse<PlayerStatistics[]>>(Endpoints.Summary, uuid, queries);
+            return await GetData<DataResponse<PlayerStatistics[]>>(Endpoints.R6SStats.Summary, uuid, queries);
         }
 
         public async Task<DataResponse<PlayerStatistics[]>> GetOperatorAsync(Guid uuid, Gamemode gamemodes, Platform platforms, TeamRole teamroles, DateTime start, DateTime end)
@@ -128,42 +130,42 @@ namespace R6Sharp
             // teamRole=all?
             // ?gameMode=all,ranked,unranked,casual&platform=PC&teamRole=attacker,defender&startDate=20200718&endDate=20201115
             var queries = BuildQuery(gamemodes, start, end, platforms, teamroles, null);
-            return await GetData<DataResponse<PlayerStatistics[]>>(Endpoints.Operator, uuid, queries);
+            return await GetData<DataResponse<PlayerStatistics[]>>(Endpoints.R6SStats.Operator, uuid, queries);
         }
 
         public async Task<DataResponse<PlayerStatistics[]>> GetMapAsync(Guid uuid, Gamemode gamemodes, Platform platforms, TeamRole teamroles, DateTime start, DateTime end)
         {
             // // ?gameMode=all,ranked,unranked,casual&platform=PC&teamRole=all,attacker,defender&startDate=20200718&endDate=20201115
             var queries = BuildQuery(gamemodes, start, end, platforms, teamroles, null);
-            return await GetData<DataResponse<PlayerStatistics[]>>(Endpoints.Map, uuid, queries);
+            return await GetData<DataResponse<PlayerStatistics[]>>(Endpoints.R6SStats.Map, uuid, queries);
         }
 
         public async Task<DataResponse<WeaponStatistics>> GetWeaponAsync(Guid uuid, Gamemode gamemodes, Platform platforms, TeamRole teamroles, DateTime start, DateTime end)
         {
             // ?gameMode=all,ranked,unranked,casual&platform=PC&teamRole=all&startDate=20200718&endDate=20201115
             var queries = BuildQuery(gamemodes, start, end, platforms, teamroles, null);
-            return await GetData<DataResponse<WeaponStatistics>>(Endpoints.Weapon, uuid, queries);
+            return await GetData<DataResponse<WeaponStatistics>>(Endpoints.R6SStats.Weapon, uuid, queries);
         }
 
         public async Task<DataResponse<TrendStatistics[]>> GetTrendAsync(Guid uuid, Gamemode gamemodes, DateTime start, DateTime end, TeamRole teamroles, TrendType trendType)
         {
             // ?gameMode=all,ranked,unranked,casual&startDate=20200718&endDate=20201115&teamRole=all,attacker,defender&trendType=weeks
             var queries = BuildQuery(gamemodes, start, end, null, teamroles, trendType);
-            return await GetData<DataResponse<TrendStatistics[]>>(Endpoints.Trend, uuid, queries);
+            return await GetData<DataResponse<TrendStatistics[]>>(Endpoints.R6SStats.Trend, uuid, queries);
         }
 
         public async Task<DataResponse<SeasonalPlayerStatistics[]>> GetSeasonalAsync(Guid uuid, Gamemode gamemodes, Platform platforms)
         {
             // ?gameMode=all,ranked,unranked,casual&platform=PC
             var queries = BuildQuery(gamemodes, null, null, platforms, null, null);
-            return await GetData<DataResponse<SeasonalPlayerStatistics[]>>(Endpoints.Seasonal, uuid, queries);
+            return await GetData<DataResponse<SeasonalPlayerStatistics[]>>(Endpoints.R6SStats.Seasonal, uuid, queries);
         }
 
         public async Task<Narrative> GetNarrativeAsync(Guid uuid, DateTime start, DateTime end)
         {
             // ?startDate=20200718&endDate=20201115
             var queries = BuildQuery(null, start, end, null, null, null);
-            return await GetData<Narrative>(Endpoints.Narrative, uuid, queries);
+            return await GetData<Narrative>(Endpoints.R6SStats.Narrative, uuid, queries);
         }
 
         private KeyValuePair<string, string>[] BuildQuery(Gamemode? gamemodes, DateTime? start, DateTime? end,

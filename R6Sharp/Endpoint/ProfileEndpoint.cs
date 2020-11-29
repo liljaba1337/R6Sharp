@@ -37,7 +37,7 @@ namespace R6Sharp.Endpoint
             };
 
             var session = await _sessionHandler.GetCurrentSessionAsync().ConfigureAwait(false);
-            var results = await ApiHelper.GetDataAsync(Endpoints.Search, null, queries, session).ConfigureAwait(false);
+            var results = await ApiHelper.GetDataAsync(Endpoints.UbiServices.Search, null, queries, session).ConfigureAwait(false);
             var deserialised = JsonSerializer.Deserialize<ProfileSearch>(results);
             return deserialised.Profiles;
         }
@@ -59,7 +59,7 @@ namespace R6Sharp.Endpoint
             };
 
             var session = await _sessionHandler.GetCurrentSessionAsync().ConfigureAwait(false);
-            var results = await ApiHelper.GetDataAsync(Endpoints.Search, null, queries, session).ConfigureAwait(false);
+            var results = await ApiHelper.GetDataAsync(Endpoints.UbiServices.Search, null, queries, session).ConfigureAwait(false);
             var deserialised = JsonSerializer.Deserialize<ProfileSearch>(results);
             return deserialised.Profiles;
         }

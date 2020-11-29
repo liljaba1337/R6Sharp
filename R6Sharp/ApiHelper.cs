@@ -20,7 +20,10 @@ namespace R6Sharp
         {
             if (platform != null)
             {
-                if (url.Equals(Endpoints.Progressions) || url.Equals(Endpoints.Players) || url.Equals(Endpoints.Statistics))
+                if (url.Equals(Endpoints.UbiServices.Progressions) ||
+                    url.Equals(Endpoints.UbiServices.Players) ||
+                    url.Equals(Endpoints.UbiServices.Statistics) ||
+                    url.Equals(Endpoints.UbiServices.PlayerSkillRecords))
                 {
                     url = string.Format(url, Constant.PlatformToGuid(platform ?? default), Constant.PlatformToSandbox(platform ?? default));
                 }
@@ -48,14 +51,14 @@ namespace R6Sharp
 
             var uri = new Uri(url);
             // Add authorization header with ticket (may be null, for requests that are static)
-            var headerValuePairs = new KeyValuePair<string, string>[3];
+            var headerValuePairs = new List<KeyValuePair<string, string>>();
             if (session != null)
             {
-                headerValuePairs[0] = new KeyValuePair<string, string>("Authorization", $"Ubi_v1 t={session.Ticket}");
-                headerValuePairs[1] = new KeyValuePair<string, string>("Expiration", session.Expiration.ToString("O"));
-                headerValuePairs[2] = new KeyValuePair<string, string>("Ubi-SessionID", session.SessionId.ToString());
+                headerValuePairs.Add(new KeyValuePair<string, string>("Authorization", $"Ubi_v1 t={session.Ticket}"));
+                headerValuePairs.Add(new KeyValuePair<string, string>("Expiration", session.Expiration.ToString("O")));
+                headerValuePairs.Add(new KeyValuePair<string, string>("Ubi-SessionID", session.SessionId.ToString()));
             }
-            return await BuildRequestAsync(uri, headerValuePairs, null, true).ConfigureAwait(false);
+            return await BuildRequestAsync(uri, headerValuePairs.ToArray(), null, true).ConfigureAwait(false);
         }
 
         internal static async Task<string> BuildRequestAsync(Uri uri, KeyValuePair<string, string>[] additionalHeaderValues, byte[] data, bool get)

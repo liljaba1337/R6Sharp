@@ -44,7 +44,7 @@ namespace R6Sharp.Endpoint
             };
 
             var session = await _sessionHandler.GetCurrentSessionAsync().ConfigureAwait(false);
-            var results = await ApiHelper.GetDataAsync(Endpoints.Players, platform, queries, session).ConfigureAwait(false);
+            var results = await ApiHelper.GetDataAsync(Endpoints.UbiServices.Players, platform, queries, session).ConfigureAwait(false);
             var deserialised = JsonSerializer.Deserialize<BoardInfoFetch>(results);
             return deserialised.Players;
         }
@@ -78,45 +78,82 @@ namespace R6Sharp.Endpoint
             };
 
             var session = await _sessionHandler.GetCurrentSessionAsync().ConfigureAwait(false);
-            var results = await ApiHelper.GetDataAsync(Endpoints.Players, platform, queries, session).ConfigureAwait(false);
+            var results = await ApiHelper.GetDataAsync(Endpoints.UbiServices.Players, platform, queries, session).ConfigureAwait(false);
             var deserialised = JsonSerializer.Deserialize<BoardInfoFetch>(results);
             return deserialised.Players;
         }
 
         /// <inheritdoc/>
-        public async Task<Dictionary<string, BoardInfo>> GetRankedAsync(Guid uuid, Platform platform, Region region)
+        public async Task<BoardInfo> GetRankedAsync(Guid uuid, Platform platform)
+        {
+            var result = await GetRankedAsync(uuid, platform, Region.NCSA, -1).ConfigureAwait(false);
+            return result;
+        }
+
+        /// <inheritdoc/>
+        public async Task<Dictionary<string, BoardInfo>> GetRankedAsync(Guid[] uuids, Platform platform)
+        {
+            return await GetRankedAsync(uuids, platform, Region.NCSA, -1).ConfigureAwait(false);
+        }
+
+        /// <inheritdoc/>
+        public async Task<BoardInfo> GetRankedAsync(Guid uuid, Platform platform, Region region, int season)
+        {
+            var result = await GetRankedAsync(new[] { uuid }, platform, region, season).ConfigureAwait(false);
+            return result[uuid.ToString()];
+        }
+
+        /// <inheritdoc/>
+        public async Task<BoardInfo> GetCasualAsync(Guid uuid, Platform platform)
+        {
+            var result = await GetCasualAsync(uuid, platform, Region.NCSA, -1).ConfigureAwait(false);
+            return result;
+        }
+
+        /// <inheritdoc/>
+        public async Task<Dictionary<string, BoardInfo>> GetCasualAsync(Guid[] uuids, Platform platform)
+        {
+            return await GetCasualAsync(uuids, platform, Region.NCSA, -1).ConfigureAwait(false);
+        }
+
+        /// <inheritdoc/>
+        public async Task<BoardInfo> GetCasualAsync(Guid uuid, Platform platform, Region region, int season)
+        {
+            var result = await GetCasualAsync(new[] { uuid }, platform, region, season).ConfigureAwait(false);
+            return result[uuid.ToString()];
+        }
+
+        #region Obseletes
+        // Since no season is specified, it is assumed the latest season is to be retrieved,
+        // which doesn't matter what region is selected since they all have been merged from
+        // season 18 and onwards.
+        [Obsolete]
+        /// <inheritdoc/>
+        public async Task<BoardInfo> GetRankedAsync(Guid uuid, Platform platform, Region region)
         {
             return await GetRankedAsync(uuid, platform, region, -1).ConfigureAwait(false);
         }
 
+        [Obsolete]
         /// <inheritdoc/>
         public async Task<Dictionary<string, BoardInfo>> GetRankedAsync(Guid[] uuids, Platform platform, Region region)
         {
             return await GetRankedAsync(uuids, platform, region, -1).ConfigureAwait(false);
         }
 
+        [Obsolete]
         /// <inheritdoc/>
-        public async Task<Dictionary<string, BoardInfo>> GetRankedAsync(Guid uuid, Platform platform, Region region, int season)
-        {
-            return await GetRankedAsync(new[] { uuid }, platform, region, season).ConfigureAwait(false);
-        }
-
-        /// <inheritdoc/>
-        public async Task<Dictionary<string, BoardInfo>> GetCasualAsync(Guid uuid, Platform platform, Region region)
+        public async Task<BoardInfo> GetCasualAsync(Guid uuid, Platform platform, Region region)
         {
             return await GetCasualAsync(uuid, platform, region, -1).ConfigureAwait(false);
         }
 
+        [Obsolete]
         /// <inheritdoc/>
         public async Task<Dictionary<string, BoardInfo>> GetCasualAsync(Guid[] uuids, Platform platform, Region region)
         {
             return await GetCasualAsync(uuids, platform, region, -1).ConfigureAwait(false);
         }
-
-        /// <inheritdoc/>
-        public async Task<Dictionary<string, BoardInfo>> GetCasualAsync(Guid uuid, Platform platform, Region region, int season)
-        {
-            return await GetCasualAsync(new[] { uuid }, platform, region, season).ConfigureAwait(false);
-        }
+        #endregion
     }
 }

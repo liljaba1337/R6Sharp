@@ -1,5 +1,9 @@
 ﻿using R6Sharp;
+using R6Sharp.Endpoint;
+using R6Sharp.Response;
+using R6Sharp.Response.Static;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.Json;
@@ -35,14 +39,35 @@ namespace Example
                 Guid.Parse("44444444-4444-4444-4444-444444444444")
             };
 
-            var username = "Stefrosmac";
+            var username = "Pseudosin";
             var platform = Platform.PC;
+
+            Profile profile = api.Profile.GetProfileAsync(username, platform).Result;
+            var uuid = profile.UserId;
+
+            PlayerProgression playerProgression = api.PlayerProgression.GetPlayerProgressionAsync(uuid, platform).Result;
+            var playerLevel = playerProgression.Level;
+
+            // As of season 18, regional board (ranked and casual) statistics have merged and cross regions now
+            BoardInfo playerRanked = api.Player.GetRankedAsync(uuid, platform).Result;
+            var playerMMR = playerRanked.MMR;
+            // get casual queue stats
+            // var playerCasual = api.Player.GetCasualAsync(uuid, platform);                            
+            // get season 17 ranked stats for EMEA
+            // var playerRankedSeason17 = api.Player.GetRankedAsync(uuid, platform, Region.EMEA, 17);
+
+            var seasons = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
+            PlayersSkillRecords playerSkillRecords = api.PlayersSkillRecordsEndpoint
+                                                        .GetPlayerSkillRecordsAsync(uuid, platform, Region.EMEA, seasons).Result;
+            var recordMMR = playerSkillRecords.SeasonsPlayerSkillRecords[^1]
+                                              .RegionsPlayerSkillRecords[0]
+                                              .BoardsPlayerSkillRecords[0]
+                                              .PlayerSkillRecords[0]
+                                              .MMR;
+
             var gamemodes = Gamemode.All | Gamemode.Ranked | Gamemode.Unranked | Gamemode.Casual;
             var from = new DateTime(2016, 06, 16);
             var to = new DateTime(2020, 11, 26);
-
-            var profile = api.Profile.GetProfileAsync(username, platform).Result;
-            var uuid = profile.UserId;
 
             var summary = api.GetSummaryAsync(uuid, gamemodes, platform, from, to).Result;
             var operators = api.GetOperatorAsync(uuid, gamemodes, platform, TeamRole.Attacker | TeamRole.Defender, from, to).Result;
