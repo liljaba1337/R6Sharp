@@ -3,6 +3,8 @@ using static R6Sharp.Parser;
 
 namespace R6Sharp.Response.Statistic
 {
+    public enum SpecificDataType { Generalized, Seasonal };
+
     public class PlayerStatistics
     {
         [JsonPropertyName("type")]

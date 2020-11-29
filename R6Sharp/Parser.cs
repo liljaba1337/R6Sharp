@@ -1,5 +1,4 @@
 ﻿using R6Sharp.Exceptions;
-using R6Sharp.Response;
 using R6Sharp.Response.Static;
 using R6Sharp.Response.Statistic;
 using System;
@@ -142,8 +141,16 @@ namespace R6Sharp
                     value = reader.GetInt32().ToString();
                 }
 
-                var date = DateTime.ParseExact(value, "yyyyMMdd", null);
-                return date;
+                try
+                {
+                    var date = DateTime.ParseExact(value, "yyyyMMdd", null);
+                    return date;
+                }
+                catch (FormatException)
+                {
+                    var date = DateTime.ParseExact(value, "yyyy-MM-dd HH:mm:ss.fff", null);
+                    return date;
+                }
             }
 
             public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)

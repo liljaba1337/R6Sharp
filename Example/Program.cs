@@ -2,6 +2,7 @@
 using R6Sharp.Response;
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -55,11 +56,12 @@ namespace Example
 
             var seasons = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
             PlayersSkillRecords playerSkillRecords = api.PlayersSkillRecordsEndpoint
-                                                        .GetPlayerSkillRecordsAsync(uuid, platform, Region.EMEA, seasons).Result;
-            var recordMMR = playerSkillRecords.SeasonsPlayerSkillRecords[^1]
-                                              .RegionsPlayerSkillRecords[0]
-                                              .BoardsPlayerSkillRecords[0]
-                                              .PlayerSkillRecords[0]
+                                                        .GetPlayerSkillRecordsAsync(uuid, platform, Region.EMEA, seasons)
+                                                        .Result;
+            var recordMMR = playerSkillRecords.SeasonsPlayerSkillRecords.Last()
+                                              .RegionsPlayerSkillRecords.First()
+                                              .BoardsPlayerSkillRecords.First()
+                                              .PlayerSkillRecords.First()
                                               .MMR;
 
             var gamemodes = Gamemode.All | Gamemode.Ranked | Gamemode.Unranked | Gamemode.Casual;
@@ -67,13 +69,57 @@ namespace Example
             var to = new DateTime(2020, 11, 26);
 
             var summary = api.GetSummaryAsync(uuid, gamemodes, platform, from, to).Result;
+            var summaryKills = summary.Platforms["PC"]
+                                      .Gamemodes["all"]
+                                      .TeamRoles["all"].Last()
+                                      .Kills;
+
             var operators = api.GetOperatorAsync(uuid, gamemodes, platform, TeamRole.Attacker | TeamRole.Defender, from, to).Result;
+            var zofiaRankedWins = operators.Platforms["PC"]
+                                              .Gamemodes["ranked"]
+                                              .TeamRoles["attacker"]
+                                              .Where(x => x.StatsDetail == "Zofia").First()
+                                              .RoundsWon;
+
             var maps = api.GetMapAsync(uuid, gamemodes, platform, TeamRole.All | TeamRole.Attacker | TeamRole.Defender, from, to).Result;
+            var kanalDefenderTeamKills = maps.Platforms["PC"]
+                                             .Gamemodes["casual"]
+                                             .TeamRoles["defender"]
+                                             .Where(m => m.StatsDetail == "KANAL").First()
+                                             .TeamKills;
+
             var weapons = api.GetWeaponAsync(uuid, gamemodes, platform, TeamRole.All, from, to).Result;
+            var allSpear308HeadshotAccuracy = weapons.Platforms["PC"]
+                                                     .Gamemodes["all"]
+                                                     .TeamRoles["all"]
+                                                     .WeaponSlots
+                                                     .PrimaryWeapons
+                                                     .WeaponTypes
+                                                     .Where(t => t.WeaponTypeType == "Assault Rifles").First()
+                                                     .Weapons
+                                                     .Where(w => w.WeaponName == "SPEAR .308").First()
+                                                     .HeadshotAccuracy;
+
             var trends = api.GetTrendAsync(uuid, gamemodes, from, to, TeamRole.All | TeamRole.Attacker | TeamRole.Defender, TrendType.Weeks).Result;
+            var rankedAttackKDRTrend = trends.Platforms["PC"]
+                                             .Gamemodes["ranked"]
+                                             .TeamRoles["attacker"].Last()
+                                             .KillDeathRatio;
+
             var seasonal = api.GetSeasonalAsync(uuid, gamemodes, platform).Result;
+            var rankedY4S4MinutesPlayed = seasonal.Platforms["PC"]
+                                                  .Gamemodes["ranked"]
+                                                  .TeamRoles["all"]
+                                                  .Where(s => s.SeasonYear == "Y4")
+                                                  .Where(s => s.SeasonNumber == "S4").First()
+                                                  .MinutesPlayed;
+
             var narrative = api.GetNarrativeAsync(uuid, from, to).Result;
-            Console.WriteLine(uuid);
+            var bestMatchScoreAnyWeek = narrative.Profiles[uuid.ToString()]
+                                                 .Years.First()
+                                                 .Value.Weeks.First()
+                                                 .Value.BestMatchFullStatistics
+                                                 .Score;
         }
     }
 }

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using static R6Sharp.Parser;
 
-namespace R6Sharp.Response
+namespace R6Sharp.Response.DataResponse
 {
-    public class Narrative
+    public class NarrativeDataResponse
     {
         [JsonPropertyName("narrativeType")]
         public string NarrativeType { get; set; }

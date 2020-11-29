@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using static R6Sharp.Parser;
 
-namespace R6Sharp.Response
+namespace R6Sharp.Response.DataResponse
 {
     public enum DataType { Maps, Operators, Summary, Trend, Weapons };
-
-    public enum SpecificDataType { Generalized, Seasonal };
 
     public enum RoleType { TeamRoles, TeamRolesWeapons };
 
@@ -15,14 +13,6 @@ namespace R6Sharp.Response
     {
         [JsonPropertyName("profileId")]
         public Guid ProfileId { get; set; }
-
-        [JsonPropertyName("startDate")]
-        [JsonConverter(typeof(ParseStringToDateTime))]
-        public DateTime StartDate { get; set; }
-
-        [JsonPropertyName("endDate")]
-        [JsonConverter(typeof(ParseStringToDateTime))]
-        public DateTime EndDate { get; set; }
 
         [JsonPropertyName("region")]
         [JsonConverter(typeof(ParseStringToRegion))]
