@@ -1,5 +1,4 @@
-﻿using R6Sharp.Exceptions;
-using R6Sharp.Response;
+﻿using R6Sharp.Response;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;

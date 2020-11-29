@@ -1,9 +1,6 @@
 ﻿using R6Sharp;
-using R6Sharp.Endpoint;
 using R6Sharp.Response;
-using R6Sharp.Response.Static;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.Json;
@@ -66,7 +63,7 @@ namespace Example
                                               .MMR;
 
             var gamemodes = Gamemode.All | Gamemode.Ranked | Gamemode.Unranked | Gamemode.Casual;
-            var from = new DateTime(2016, 06, 16);
+            var from = new DateTime(2020, 06, 16);
             var to = new DateTime(2020, 11, 26);
 
             var summary = api.GetSummaryAsync(uuid, gamemodes, platform, from, to).Result;
