@@ -35,7 +35,7 @@ namespace R6Sharp.Endpoint
         /// </returns>
         public async Task<Dictionary<string, BoardInfo>> GetRankedAsync(Guid[] uuids, Platform platform, Region region, int season)
         {
-            return await Get(uuids, platform, region, season, true);
+            return await Get(uuids, platform, region, season, true).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace R6Sharp.Endpoint
         /// </returns>
         public async Task<Dictionary<string, BoardInfo>> GetCasualAsync(Guid[] uuids, Platform platform, Region region, int season)
         {
-            return await Get(uuids, platform, region, season, false);
+            return await Get(uuids, platform, region, season, false).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace R6Sharp
+﻿namespace R6Sharp
 {
     internal static class Endpoints
     {
