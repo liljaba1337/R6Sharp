@@ -6,29 +6,115 @@ Please see the Example project to see how to use this wrapper. Alternatively, he
 ```csharp
 public static class Program
 {
-    public static void Main (string[] args)
+    internal class Credential
     {
-        var api = new R6Api("email@email.com", "somepassword");
+        [JsonPropertyName("email")]
+        public string Email { get; set; }
 
-        // if you want to retrieve some specific uuids, enter like so
-        var guids = new Guid[]
+        [JsonPropertyName("password")]
+        public string Password { get; set; }
+    }
+
+    public static void Main()
+    {
+        Console.OutputEncoding = Encoding.UTF8;
+        // credentials.json = {"email": "email@email.com", "password": "somepassword"}
+        var json = File.ReadAllText(@"credentials.json");
+        var credentials = JsonSerializer.Deserialize<Credential>(json);
+        var api = new R6Api(credentials.Email, credentials.Password);
+
+        var guids = new[]
         {
-            Guid.Parse("00000000-0000-0000-0000-000000000000"),
-            Guid.Parse("11111111-1111-1111-1111-111111111111"),
-            Guid.Parse("22222222-2222-2222-2222-222222222222"),
-            Guid.Parse("33333333-3333-3333-3333-333333333333"),
-            Guid.Parse("44444444-4444-4444-4444-444444444444")
-        };
+                Guid.Parse("00000000-0000-0000-0000-000000000000"),
+                Guid.Parse("11111111-1111-1111-1111-111111111111"),
+                Guid.Parse("22222222-2222-2222-2222-222222222222"),
+                Guid.Parse("33333333-3333-3333-3333-333333333333"),
+                Guid.Parse("44444444-4444-4444-4444-444444444444")
+            };
 
-        // Searches for a player with name and platform
-        var search = api.SearchProfileAsync("Pseudosin", R6Api.Platform.Uplay).Result;
-        // Gets players' profile using specified uuids and platform
-        // var profile = api.GetProfileAsync(guids, R6Api.Platform.Uplay).Result;
-        var profile = api.GetProfileAsync(search[0].ProfileId, R6Api.Platform.Uplay).Result;
-        // Gets players' ranked stats using specified uuids, platform and region
-        var ranked = api.GetRankedAsync(search[0].ProfileId, R6Api.Platform.Uplay, R6Api.Region.EMEA).Result;
-        // Gets players' overall stats using specified uuids, platform and region (false for core, true for all)
-        var overall = api.GetOverallAsync(search[0].ProfileId, R6Api.Platform.Uplay, false).Result;
+        var username = "Pseudosin";
+        var platform = Platform.PC;
+
+        Profile profile = api.Profile.GetProfileAsync(username, platform).Result;
+        var uuid = profile.UserId;
+
+        PlayerProgression playerProgression = api.PlayerProgression.GetPlayerProgressionAsync(uuid, platform).Result;
+        var playerLevel = playerProgression.Level;
+
+        // As of season 18, regional board (ranked and casual) statistics have merged and cross regions now
+        BoardInfo playerRanked = api.Player.GetRankedAsync(uuid, platform).Result;
+        var playerMMR = playerRanked.MMR;
+        // get casual queue stats
+        // var playerCasual = api.Player.GetCasualAsync(uuid, platform);                            
+        // get season 17 ranked stats for EMEA
+        // var playerRankedSeason17 = api.Player.GetRankedAsync(uuid, platform, Region.EMEA, 17);
+
+        var seasons = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
+        PlayersSkillRecords playerSkillRecords = api.PlayersSkillRecordsEndpoint
+                                                    .GetPlayerSkillRecordsAsync(uuid, platform, Region.EMEA, seasons)
+                                                    .Result;
+        var recordMMR = playerSkillRecords.SeasonsPlayerSkillRecords.Last()
+                                          .RegionsPlayerSkillRecords.First()
+                                          .BoardsPlayerSkillRecords.First()
+                                          .PlayerSkillRecords.First()
+                                          .MMR;
+
+        var gamemodes = Gamemode.All | Gamemode.Ranked | Gamemode.Unranked | Gamemode.Casual;
+        var from = new DateTime(2020, 06, 16);
+        var to = new DateTime(2020, 11, 26);
+
+        var summary = api.GetSummaryAsync(uuid, gamemodes, platform, from, to).Result;
+        var summaryKills = summary.Platforms["PC"]
+                                  .Gamemodes["all"]
+                                  .TeamRoles["all"].Last()
+                                  .Kills;
+
+        var operators = api.GetOperatorAsync(uuid, gamemodes, platform, TeamRole.Attacker | TeamRole.Defender, from, to).Result;
+        var zofiaRankedWins = operators.Platforms["PC"]
+                                          .Gamemodes["ranked"]
+                                          .TeamRoles["attacker"]
+                                          .Where(x => x.StatsDetail == "Zofia").First()
+                                          .RoundsWon;
+
+        var maps = api.GetMapAsync(uuid, gamemodes, platform, TeamRole.All | TeamRole.Attacker | TeamRole.Defender, from, to).Result;
+        var kanalDefenderTeamKills = maps.Platforms["PC"]
+                                         .Gamemodes["casual"]
+                                         .TeamRoles["defender"]
+                                         .Where(m => m.StatsDetail == "KANAL").First()
+                                         .TeamKills;
+
+        var weapons = api.GetWeaponAsync(uuid, gamemodes, platform, TeamRole.All, from, to).Result;
+        var allSpear308HeadshotAccuracy = weapons.Platforms["PC"]
+                                                 .Gamemodes["all"]
+                                                 .TeamRoles["all"]
+                                                 .WeaponSlots
+                                                 .PrimaryWeapons
+                                                 .WeaponTypes
+                                                 .Where(t => t.WeaponTypeType == "Assault Rifles").First()
+                                                 .Weapons
+                                                 .Where(w => w.WeaponName == "SPEAR .308").First()
+                                                 .HeadshotAccuracy;
+
+        var trends = api.GetTrendAsync(uuid, gamemodes, from, to, TeamRole.All | TeamRole.Attacker | TeamRole.Defender, TrendType.Weeks).Result;
+        var rankedAttackKDRTrend = trends.Platforms["PC"]
+                                         .Gamemodes["ranked"]
+                                         .TeamRoles["attacker"].Last()
+                                         .KillDeathRatio;
+
+        var seasonal = api.GetSeasonalAsync(uuid, gamemodes, platform).Result;
+        var rankedY4S4MinutesPlayed = seasonal.Platforms["PC"]
+                                              .Gamemodes["ranked"]
+                                              .TeamRoles["all"]
+                                              .Where(s => s.SeasonYear == "Y4")
+                                              .Where(s => s.SeasonNumber == "S4").First()
+                                              .MinutesPlayed;
+
+        var narrative = api.GetNarrativeAsync(uuid, from, to).Result;
+        var bestMatchScoreAnyWeek = narrative.Profiles[uuid.ToString()]
+                                             .Years.First()
+                                             .Value.Weeks.First()
+                                             .Value.BestMatchFullStatistics
+                                             .Score;
     }
 }
 ```
