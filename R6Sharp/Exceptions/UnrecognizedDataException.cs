@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace R6Sharp.Exceptions
 {
     [Serializable]
-    internal class UnrecognizedDataException : Exception
+    public class UnrecognizedDataException : Exception
     {
         public UnrecognizedDataException()
         {
