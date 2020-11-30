@@ -45,6 +45,7 @@ namespace R6Sharp
         private const string RescueHostagePve = "rescuehostagepve_bestscore,rescuehostagepve_hostagedefense,rescuehostagepve_hostagerescue,rescuehostagepve_matchlost,rescuehostagepve_matchplayed,rescuehostagepve_matchwlratio,rescuehostagepve_matchwon,rescuehostagepve_timeplayed";
         private const string RescueHostagePvp = "rescuehostagepvp_bestscore,rescuehostagepvp_matchlost,rescuehostagepvp_matchplayed,rescuehostagepvp_matchwlratio,rescuehostagepvp_matchwon,rescuehostagepvp_totalxp";
         private const string SecureAreaPve = "secureareapve_bestscore,secureareapve_matchlost,secureareapve_matchplayed,secureareapve_matchwlratio,secureareapve_matchwon,secureareapve_serveraggression,secureareapve_serverdefender,secureareapve_servershacked,secureareapve_timeplayed";
+
         private const string SecureAreaPvp = "secureareapvp_bestscore,secureareapvp_matchlost,secureareapvp_matchplayed,secureareapvp_matchwlratio,secureareapvp_matchwon,secureareapvp_totalxp";
 
         // Terrorist Hunt/Training Grounds and missions
@@ -118,7 +119,7 @@ namespace R6Sharp
             return Platform switch
             {
                 Platform.PSN => "psn",
-                Platform.Uplay => "uplay",
+                Platform.PC => "uplay",
                 Platform.XBL => "xbl",
                 _ => throw new Exception("Platform does not exist.")
             };
@@ -140,9 +141,32 @@ namespace R6Sharp
             return Platform switch
             {
                 Platform.PSN => PSN,
-                Platform.Uplay => Uplay,
+                Platform.PC => Uplay,
                 Platform.XBL => XBL,
                 _ => throw new Exception("Platform does not exist."),
+            };
+        }
+
+        internal static string GamemodeToString(Gamemode gamemode)
+        {
+            return gamemode switch
+            {
+                Gamemode.All => "all",
+                Gamemode.Ranked => "ranked",
+                Gamemode.Unranked => "unranked",
+                Gamemode.Casual => "casual",
+                _ => throw new Exception("Gamemode does not exist")
+            };
+        }
+
+        internal static string PlatformToName(Platform platform)
+        {
+            return platform switch
+            {
+                Platform.PC => "PC",
+                Platform.PSN => "PS4",
+                Platform.XBL => "XONE",
+                _ => throw new Exception("New platform does not exist."),
             };
         }
 
@@ -151,9 +175,20 @@ namespace R6Sharp
             return platform switch
             {
                 Platform.PSN => "OSBOR_PS4_LNCH_A",
-                Platform.Uplay => "OSBOR_PC_LNCH_A",
+                Platform.PC => "OSBOR_PC_LNCH_A",
                 Platform.XBL => "OSBOR_XBOXONE_LNCH_A",
                 _ => throw new Exception("Platform does not exist."),
+            };
+        }
+
+        internal static string TeamRoleToString(TeamRole teamrole)
+        {
+            return teamrole switch
+            {
+                TeamRole.All => "all",
+                TeamRole.Attacker => "attacker",
+                TeamRole.Defender => "defender",
+                _ => throw new Exception("Team role does not exist."),
             };
         }
     }

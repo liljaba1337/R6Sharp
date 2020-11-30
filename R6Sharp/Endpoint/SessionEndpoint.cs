@@ -35,6 +35,14 @@ namespace R6Sharp.Endpoint
             _credentialsb64 = Convert.ToBase64String(bytes);
         }
 
+        public async Task<Session> GetCurrentSessionAsync()
+        {
+            // refresh ticket state
+            await GetTicketAsync().ConfigureAwait(false);
+
+            return _currentSession;
+        }
+
         public async Task<string> GetTicketAsync()
         {
             var sessionFileName = "session.json";
@@ -111,11 +119,12 @@ namespace R6Sharp.Endpoint
             // Add authorization header
             var headervaluepairs = new[]
             {
-                    new KeyValuePair<HttpRequestHeader, string>(HttpRequestHeader.Authorization, $"Basic {_credentialsb64}")
-                };
+                new KeyValuePair<string, string>(HttpRequestHeader.Authorization.ToString(), $"Basic {_credentialsb64}")
+            };
 
             // Get result from endpoint
-            var response = await ApiHelper.BuildRequestAsync(new Uri(Endpoints.Sessions), headervaluepairs, data, false).ConfigureAwait(false);
+            var endpoint = new Uri(Endpoints.UbiServices.Sessions);
+            var response = await ApiHelper.BuildRequestAsync(endpoint, headervaluepairs, data, false).ConfigureAwait(false);
             return JsonSerializer.Deserialize<Session>(response);
         }
     }

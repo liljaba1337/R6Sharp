@@ -34,13 +34,14 @@ namespace R6Sharp.Endpoint
                 new KeyValuePair<string, string>("profile_ids", string.Join(',', uuids))
             };
 
-            var ticket = await _sessionHandler.GetTicketAsync().ConfigureAwait(false);
-            var results = await ApiHelper.GetDataAsync(Endpoints.Progressions, platform, queries, ticket).ConfigureAwait(false);
+            var session = await _sessionHandler.GetCurrentSessionAsync().ConfigureAwait(false);
+            var results = await ApiHelper.GetDataAsync(Endpoints.UbiServices.Progressions, platform, queries, session).ConfigureAwait(false);
             var deserialised = JsonSerializer.Deserialize<PlayerProgressionFetch>(results);
             foreach (var result in deserialised.PlayerProgressions)
             {
                 // Attach link to player profile icon url
-                result.ProfileIcon = new Uri(string.Format(Endpoints.Avatar, result.ProfileId, Constant.Rainbow6S));
+                var formatted = string.Format(Endpoints.Static.Avatar, result.ProfileId, Constant.Rainbow6S);
+                result.ProfileIcon = new Uri(formatted);
             }
             return deserialised.PlayerProgressions;
         }

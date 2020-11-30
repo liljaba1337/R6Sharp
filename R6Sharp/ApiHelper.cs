@@ -1,97 +1,28 @@
-﻿using R6Sharp.Response.Static;
+﻿using R6Sharp.Response;
 using System;
-using System.Buffers;
-using System.Buffers.Text;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Mime;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace R6Sharp
 {
     internal static class ApiHelper
     {
-        /// <summary>
-        /// Parses string to int from JSON strings.
-        /// </summary>
-        /// Solution by VahidN/Stack Overflow: https://stackoverflow.com/a/59322077/4339019
-        internal class ParseStringToInt : JsonConverter<int>
+        internal static async Task<string> GetDataAsync(string url, Guid player, IEnumerable<KeyValuePair<string, string>> queries, Session session)
         {
-            public override int Read(ref Utf8JsonReader reader, Type type, JsonSerializerOptions options)
-            {
-                if (reader.TokenType == JsonTokenType.String)
-                {
-                    ReadOnlySpan<byte> span = reader.HasValueSequence ? reader.ValueSequence.ToArray() : reader.ValueSpan;
-                    if (Utf8Parser.TryParse(span, out int number, out int bytesConsumed) && span.Length == bytesConsumed)
-                    {
-                        return number;
-                    }
-
-                    if (int.TryParse(reader.GetString(), out number))
-                    {
-                        return number;
-                    }
-                }
-
-                return reader.GetInt32();
-            }
-
-            public override void Write(Utf8JsonWriter writer, int value, JsonSerializerOptions options)
-            {
-                writer.WriteStringValue(value.ToString());
-            }
+            url = string.Format(url, player.ToString());
+            return await GetDataAsync(url, queries, session).ConfigureAwait(false);
         }
 
-        internal class ParseStringToUri : JsonConverter<Uri>
-        {
-            public override Uri Read(ref Utf8JsonReader reader, Type type, JsonSerializerOptions options)
-            {
-                if (reader.TokenType == JsonTokenType.String)
-                {
-                    if (Uri.TryCreate(reader.GetString(), UriKind.RelativeOrAbsolute, out Uri uri))
-                    {
-                        return uri;
-                    }
-                }
-
-                return new Uri(reader.GetString());
-            }
-
-            public override void Write(Utf8JsonWriter writer, Uri value, JsonSerializerOptions options)
-            {
-                writer.WriteStringValue(value.ToString());
-            }
-        }
-
-        internal class ParseStringToId : JsonConverter<RankId>
-        {
-            public override RankId Read(ref Utf8JsonReader reader, Type type, JsonSerializerOptions options)
-            {
-                if (reader.TokenType == JsonTokenType.String)
-                {
-                    if (Enum.TryParse(reader.GetString(), true, out RankId id))
-                    {
-                        return id;
-                    }
-                }
-
-                return Enum.Parse<RankId>(reader.GetString());
-            }
-
-            public override void Write(Utf8JsonWriter writer, RankId value, JsonSerializerOptions options)
-            {
-                writer.WriteStringValue(value.ToString());
-            }
-        }
-
-        internal static async Task<string> GetDataAsync(string url, Platform? platform, IEnumerable<KeyValuePair<string, string>> queries, string ticket)
+        internal static async Task<string> GetDataAsync(string url, Platform? platform, IEnumerable<KeyValuePair<string, string>> queries, Session session)
         {
             if (platform != null)
             {
-                if (url.Equals(Endpoints.Progressions) || url.Equals(Endpoints.Players) || url.Equals(Endpoints.Statistics))
+                if (url.Equals(Endpoints.UbiServices.Progressions) ||
+                    url.Equals(Endpoints.UbiServices.Players) ||
+                    url.Equals(Endpoints.UbiServices.PlayerSkillRecords))
                 {
                     url = string.Format(url, Constant.PlatformToGuid(platform ?? default), Constant.PlatformToSandbox(platform ?? default));
                 }
@@ -100,6 +31,11 @@ namespace R6Sharp
                     url = string.Format(url, Constant.PlatformToGuid(platform ?? default));
                 }
             }
+            return await GetDataAsync(url, queries, session).ConfigureAwait(false);
+        }
+
+        private static async Task<string> GetDataAsync(string url, IEnumerable<KeyValuePair<string, string>> queries, Session session)
+        {
             if (queries != null)
             {
                 // TO-DO: find a better, more secure way of doing this
@@ -114,23 +50,29 @@ namespace R6Sharp
 
             var uri = new Uri(url);
             // Add authorization header with ticket (may be null, for requests that are static)
-            var headerValuePairs = new KeyValuePair<HttpRequestHeader, string>[1];
-            if (ticket != null)
+            var headerValuePairs = new List<KeyValuePair<string, string>>();
+            if (session != null)
             {
-                headerValuePairs[0] = new KeyValuePair<HttpRequestHeader, string>(HttpRequestHeader.Authorization, $"Ubi_v1 t={ticket}");
+                headerValuePairs.Add(new KeyValuePair<string, string>("Authorization", $"Ubi_v1 t={session.Ticket}"));
+                headerValuePairs.Add(new KeyValuePair<string, string>("Expiration", session.Expiration.ToString("O")));
+                headerValuePairs.Add(new KeyValuePair<string, string>("Ubi-SessionID", session.SessionId.ToString()));
             }
-            return await BuildRequestAsync(uri, headerValuePairs, null, true).ConfigureAwait(false);
+            return await BuildRequestAsync(uri, headerValuePairs.ToArray(), null, true).ConfigureAwait(false);
         }
 
-        internal static async Task<string> BuildRequestAsync(Uri uri, KeyValuePair<HttpRequestHeader, string>[] additionalHeaderValues, byte[] data, bool get)
+        internal static async Task<string> BuildRequestAsync(Uri uri, KeyValuePair<string, string>[] additionalHeaderValues, byte[] data, bool get)
         {
             // Build a web request to endpoint
             var request = WebRequest.CreateHttp(uri);
             // Set request method
             request.Method = get ? WebRequestMethods.Http.Get : WebRequestMethods.Http.Post;
             // Apply usual request headers that should be in all requests to Ubisoft
-            request.Headers.Add(HttpRequestHeader.ContentType, MediaTypeNames.Application.Json);
+            if (!uri.AbsoluteUri.Contains("r6s-stats"))
+            {
+                request.Headers.Add(HttpRequestHeader.ContentType, MediaTypeNames.Application.Json);
+            }
             request.Headers.Add("Ubi-AppId", Constant.Rainbow6S.ToString());
+            request.Headers.Add(HttpRequestHeader.UserAgent, "R6Sharp/2.0");
             // Apply auxiliary headers supplied to method
             foreach (var additionalHeaderValue in additionalHeaderValues)
             {
@@ -157,6 +99,73 @@ namespace R6Sharp
             }
 
             return result;
+        }
+
+        internal static string DeriveGamemodeFlags(Gamemode gamemode)
+        {
+            var gamemodes = new List<string>();
+
+            if (gamemode.HasFlag(Gamemode.Casual))
+            {
+                gamemodes.Add(Constant.GamemodeToString(Gamemode.Casual));
+            }
+
+            if (gamemode.HasFlag(Gamemode.Unranked))
+            {
+                gamemodes.Add(Constant.GamemodeToString(Gamemode.Unranked));
+            }
+
+            if (gamemode.HasFlag(Gamemode.Ranked))
+            {
+                gamemodes.Add(Constant.GamemodeToString(Gamemode.Ranked));
+            }
+
+            if (gamemode.HasFlag(Gamemode.All))
+            {
+                gamemodes.Add(Constant.GamemodeToString(Gamemode.All));
+            }
+
+            return string.Join(',', gamemodes);
+        }
+
+        internal static string DerivePlatformFlags(Platform platform)
+        {
+            var platforms = new List<string>();
+
+            if (platform.HasFlag(Platform.PC))
+            {
+                platforms.Add(Constant.PlatformToName(Platform.PC));
+            }
+            if (platform.HasFlag(Platform.PSN))
+            {
+                platforms.Add(Constant.PlatformToName(Platform.PSN));
+            }
+            if (platform.HasFlag(Platform.XBL))
+            {
+                platforms.Add(Constant.PlatformToName(Platform.XBL));
+            }
+
+            return string.Join(',', platforms);
+        }
+
+        internal static string DeriveTeamRoleFlags(TeamRole teamrole)
+        {
+            var teamroles = new List<string>();
+
+            if (teamrole.HasFlag(TeamRole.All))
+            {
+                teamroles.Add(Constant.TeamRoleToString(TeamRole.All));
+            }
+            if (teamrole.HasFlag(TeamRole.Attacker))
+            {
+                teamroles.Add(Constant.TeamRoleToString(TeamRole.Attacker));
+            }
+            if (teamrole.HasFlag(TeamRole.Defender))
+            {
+                teamroles.Add(Constant.TeamRoleToString(TeamRole.Defender));
+            }
+
+            return string.Join(',', teamroles);
         }
     }
 }

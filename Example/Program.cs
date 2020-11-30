@@ -1,11 +1,8 @@
 ﻿using R6Sharp;
-using R6Sharp.Endpoint;
 using R6Sharp.Response;
-using R6Sharp.Response.Static;
-using R6Sharp.Response.Statistic;
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -40,52 +37,89 @@ namespace Example
                 Guid.Parse("44444444-4444-4444-4444-444444444444")
             };
 
-            #region Player Data
             var username = "Pseudosin";
-            var platform = Platform.Uplay;
-            var region = Region.EMEA;
+            var platform = Platform.PC;
 
             Profile profile = api.Profile.GetProfileAsync(username, platform).Result;
-            // var profile = api.GetProfileAsync(guids, platform).Result;
-            Console.WriteLine($"Profile ID:         {profile.UserId}");
+            var uuid = profile.UserId;
 
-            PlayerProgression progression = api.PlayerProgression.GetPlayerProgressionAsync(profile.ProfileId, platform).Result;
-            Console.WriteLine($"Level:              {progression.Level}");
+            PlayerProgression playerProgression = api.PlayerProgression.GetPlayerProgressionAsync(uuid, platform).Result;
+            var playerLevel = playerProgression.Level;
 
-            Dictionary<string, BoardInfo> ranked = api.Player.GetRankedAsync(profile.ProfileId, platform, region).Result;
-            Console.WriteLine($"Ranked Rank:        {ranked[progression.ProfileId.ToString()].Rank}");
+            // As of season 18, regional board (ranked and casual) statistics have merged and cross regions now
+            BoardInfo playerRanked = api.Player.GetRankedAsync(uuid, platform).Result;
+            var playerMMR = playerRanked.MMR;
+            // get casual queue stats
+            // var playerCasual = api.Player.GetCasualAsync(uuid, platform);                            
+            // get season 17 ranked stats for EMEA
+            // var playerRankedSeason17 = api.Player.GetRankedAsync(uuid, platform, Region.EMEA, 17);
 
-            Dictionary<string, BoardInfo> casual = api.Player.GetCasualAsync(profile.ProfileId, platform, region).Result;
-            Console.WriteLine($"Casual Rank:        {casual[progression.ProfileId.ToString()].Rank}");
+            var seasons = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
+            PlayersSkillRecords playerSkillRecords = api.PlayersSkillRecordsEndpoint
+                                                        .GetPlayerSkillRecordsAsync(uuid, platform, Region.EMEA, seasons)
+                                                        .Result;
+            var recordMMR = playerSkillRecords.SeasonsPlayerSkillRecords.Last()
+                                              .RegionsPlayerSkillRecords.First()
+                                              .BoardsPlayerSkillRecords.First()
+                                              .PlayerSkillRecords.First()
+                                              .MMR;
 
-            EquipmentStatistic equipments = api.Statistic.GetEquipmentStatistics(profile.ProfileId, Platform.Uplay).Result;
-            GamemodeStatistic gamemodes = api.Statistic.GetGamemodeStatistics(profile.ProfileId, Platform.Uplay).Result;
-            OperatorStatistic operators = api.Statistic.GetOperatorStatistics(profile.ProfileId, Platform.Uplay).Result;
-            QueueStatistic queues = api.Statistic.GetQueueStatistics(profile.ProfileId, Platform.Uplay).Result;
-            TerroristHuntMissionStatistic terroristhuntmissions = api.Statistic.GetTerroristHuntMissionsStatistics(profile.ProfileId, Platform.Uplay).Result;
-            #endregion
+            var gamemodes = Gamemode.All | Gamemode.Ranked | Gamemode.Unranked | Gamemode.Casual;
+            var from = new DateTime(2020, 06, 16);
+            var to = new DateTime(2020, 11, 26);
 
-            #region Static Data
-            SeasonsInfo seasonsInfo = api.Static.GetSeasonsInfoAsync().Result;
-            Console.WriteLine($"Latest Season:      {seasonsInfo.LatestSeason}");
+            var summary = api.GetSummaryAsync(uuid, gamemodes, platform, from, to).Result;
+            var summaryKills = summary.Platforms["PC"]
+                                      .Gamemodes["all"]
+                                      .TeamRoles["all"].Last()
+                                      .Kills;
 
-            Season season = api.Static.GetSeasonAsync(seasonsInfo.LatestSeason).Result;
-            // Season season = Season.GetSeasonAsync().Result;
-            Console.WriteLine($"Current Season:     {season.Id}");
+            var operators = api.GetOperatorAsync(uuid, gamemodes, platform, TeamRole.Attacker | TeamRole.Defender, from, to).Result;
+            var zofiaRankedWins = operators.Platforms["PC"]
+                                              .Gamemodes["ranked"]
+                                              .TeamRoles["attacker"]
+                                              .Where(x => x.StatsDetail == "Zofia").First()
+                                              .RoundsWon;
 
-            Dictionary<string, string> locales = api.Static.GetLocaleAsync(Language.BritishEnglish).Result;
-            List<SeasonDetail> seasonDetails = api.Static.GetSeasonDetailsAsync().Result;
+            var maps = api.GetMapAsync(uuid, gamemodes, platform, TeamRole.All | TeamRole.Attacker | TeamRole.Defender, from, to).Result;
+            var kanalDefenderTeamKills = maps.Platforms["PC"]
+                                             .Gamemodes["casual"]
+                                             .TeamRoles["defender"]
+                                             .Where(m => m.StatsDetail == "KANAL").First()
+                                             .TeamKills;
 
-            var seasonId = 18;
-            // Find season details for season 18
-            var seasonDetail = seasonDetails.Find(x => x.Id == seasonId);
-            // Get the highest rank for that season (should be champion)
-            var highestSeasonRank = seasonDetail.Ranks[^1];
-            var rankOasis = highestSeasonRank.Name.OasisId;
-            // Get rank name from locale dictionary to localise variable names (e.g. champion -> şampiyon)
-            Console.WriteLine($"Highest Rank Name:  {locales[rankOasis.ToString()]}");
-            Console.WriteLine($"Highest Rank URL:   {highestSeasonRank.Images.Hd}");
-            #endregion
+            var weapons = api.GetWeaponAsync(uuid, gamemodes, platform, TeamRole.All, from, to).Result;
+            var allSpear308HeadshotAccuracy = weapons.Platforms["PC"]
+                                                     .Gamemodes["all"]
+                                                     .TeamRoles["all"]
+                                                     .WeaponSlots
+                                                     .PrimaryWeapons
+                                                     .WeaponTypes
+                                                     .Where(t => t.WeaponTypeType == "Assault Rifles").First()
+                                                     .Weapons
+                                                     .Where(w => w.WeaponName == "SPEAR .308").First()
+                                                     .HeadshotAccuracy;
+
+            var trends = api.GetTrendAsync(uuid, gamemodes, from, to, TeamRole.All | TeamRole.Attacker | TeamRole.Defender, TrendType.Weeks).Result;
+            var rankedAttackKDRTrend = trends.Platforms["PC"]
+                                             .Gamemodes["ranked"]
+                                             .TeamRoles["attacker"].Last()
+                                             .KillDeathRatio;
+
+            var seasonal = api.GetSeasonalAsync(uuid, gamemodes, platform).Result;
+            var rankedY4S4MinutesPlayed = seasonal.Platforms["PC"]
+                                                  .Gamemodes["ranked"]
+                                                  .TeamRoles["all"]
+                                                  .Where(s => s.SeasonYear == "Y4")
+                                                  .Where(s => s.SeasonNumber == "S4").First()
+                                                  .MinutesPlayed;
+
+            var narrative = api.GetNarrativeAsync(uuid, from, to).Result;
+            var bestMatchScoreAnyWeek = narrative.Profiles[uuid.ToString()]
+                                                 .Years.First()
+                                                 .Value.Weeks.First()
+                                                 .Value.BestMatchFullStatistics
+                                                 .Score;
         }
     }
 }
