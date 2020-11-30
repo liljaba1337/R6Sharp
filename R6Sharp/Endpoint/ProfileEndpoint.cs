@@ -30,16 +30,12 @@ namespace R6Sharp.Endpoint
         /// </returns>
         public async Task<List<Profile>> GetProfileAsync(string[] players, Platform platform)
         {
-            var queries = new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("nameOnPlatform", HttpUtility.UrlEncode(string.Join(',', players))),
-                new KeyValuePair<string, string>("platformType", Constant.PlatformToString(platform))
-            };
+            return await Get(platform, "nameOnPlatform", HttpUtility.UrlEncode(string.Join(',', players))).ConfigureAwait(false);
+        }
 
-            var session = await _sessionHandler.GetCurrentSessionAsync().ConfigureAwait(false);
-            var results = await ApiHelper.GetDataAsync(Endpoints.UbiServices.Search, null, queries, session).ConfigureAwait(false);
-            var deserialised = JsonSerializer.Deserialize<ProfileSearch>(results);
-            return deserialised.Profiles;
+        public async Task<List<Profile>> GetProfileAsync(Guid[] uuids, Platform platform)
+        {
+            return await Get(platform, "idOnPlatform", HttpUtility.UrlEncode(string.Join(',', uuids))).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -50,26 +46,26 @@ namespace R6Sharp.Endpoint
             return profiles.Count > 0 ? profiles[0] : null;
         }
 
-        public async Task<List<Profile>> GetProfileAsync(Guid[] uuids, Platform platform)
-        {
-            var queries = new List<KeyValuePair<string, string>>
-            {
-                new KeyValuePair<string, string>("idOnPlatform", HttpUtility.UrlEncode(string.Join(',', uuids))),
-                new KeyValuePair<string, string>("platformType", Constant.PlatformToString(platform))
-            };
-
-            var session = await _sessionHandler.GetCurrentSessionAsync().ConfigureAwait(false);
-            var results = await ApiHelper.GetDataAsync(Endpoints.UbiServices.Search, null, queries, session).ConfigureAwait(false);
-            var deserialised = JsonSerializer.Deserialize<ProfileSearch>(results);
-            return deserialised.Profiles;
-        }
-
         /// <inheritdoc/>
         public async Task<Profile> GetProfileAsync(Guid uuid, Platform platform)
         {
             var profiles = await GetProfileAsync(new Guid[] { uuid }, platform).ConfigureAwait(false);
             // the search result could contain more than one result, return first anyways
             return profiles.Count > 0 ? profiles[0] : null;
+        }
+
+        private async Task<List<Profile>> Get(Platform platform, string queryKey, string queryValue)
+        {
+            var queries = new List<KeyValuePair<string, string>>
+            {
+                new KeyValuePair<string, string>("platformType", Constant.PlatformToString(platform))
+            };
+            queries.Add(new KeyValuePair<string, string>(queryKey, queryValue));
+
+            var session = await _sessionHandler.GetCurrentSessionAsync().ConfigureAwait(false);
+            var results = await ApiHelper.GetDataAsync(Endpoints.UbiServices.Search, null, queries, session).ConfigureAwait(false);
+            var deserialised = JsonSerializer.Deserialize<ProfileSearch>(results);
+            return deserialised.Profiles;
         }
     }
 }

@@ -63,12 +63,12 @@ namespace R6Sharp
 
     public class R6Api
     {
-        private readonly SessionEndpoint _session;
+        private SessionEndpoint _session { get; }
 
-        public readonly ProfileEndpoint Profile;
-        public readonly PlayerProgressionEndpoint PlayerProgression;
-        public readonly PlayerEndpoint Player;
-        public readonly PlayersSkillRecordsEndpoint PlayersSkillRecordsEndpoint;
+        public ProfileEndpoint Profile { get; }
+        public PlayerProgressionEndpoint PlayerProgression { get; }
+        public PlayerEndpoint Player { get; }
+        public PlayersSkillRecordsEndpoint PlayersSkillRecordsEndpoint { get; }
 
         #region Constructors
         /// <summary>

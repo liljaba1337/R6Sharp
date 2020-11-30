@@ -203,11 +203,14 @@ namespace R6Sharp
             public override TrendDataType Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
             {
                 var type = reader.GetString();
-                return type switch
+                if (type == "Trend Blocks")
                 {
-                    "Trend Blocks" => TrendDataType.TrendBlocks,
-                    _ => throw new UnrecognizedDataException($"Could not recognize \"{type}\" as {typeof(TrendDataType).Name}."),
-                };
+                    return TrendDataType.TrendBlocks;
+                }
+                else
+                {
+                    throw new UnrecognizedDataException($"Could not recognize \"{type}\" as {typeof(TrendDataType).Name}.");
+                }
             }
 
             public override void Write(Utf8JsonWriter writer, TrendDataType value, JsonSerializerOptions options)
