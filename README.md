@@ -2,7 +2,7 @@
 ## Description
 An (unofficial) API wrapper for Rainbow 6 Siege to get player stats from Ubisoft's website. Although Ubisoft does not provide an official API endpoint for developers to retrieve player data (therefore not explicitly sanctioned), their own pages retrieve it through web requests using JavaScript to specific endpoints.
 ## Usage
-Please see the Example project to see how to use this wrapper. Alternatively, here's an example:
+Please see the [Example](Example/Program.cs) project to see how to use this wrapper. Alternatively, here's an example:
 ```csharp
 public static class Program
 {
