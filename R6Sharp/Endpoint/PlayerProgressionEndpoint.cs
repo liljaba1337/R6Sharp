@@ -36,7 +36,7 @@ namespace R6Sharp.Endpoint
 
             var session = await _sessionHandler.GetCurrentSessionAsync().ConfigureAwait(false);
             var results = await ApiHelper.GetDataAsync(Endpoints.UbiServices.Progressions, platform, queries, session).ConfigureAwait(false);
-            var deserialised = JsonSerializer.Deserialize<PlayerProgressionFetch>(results);
+            var deserialised = await JsonSerializer.DeserializeAsync<PlayerProgressionFetch>(results).ConfigureAwait(false);
             foreach (var result in deserialised.PlayerProgressions)
             {
                 // Attach link to player profile icon url

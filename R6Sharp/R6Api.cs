@@ -219,7 +219,7 @@ namespace R6Sharp
         {
             var session = await _session.GetCurrentSessionAsync().ConfigureAwait(false);
             var results = await ApiHelper.GetDataAsync(endpoint, uuid, queries, session).ConfigureAwait(false);
-            var deserialised = JsonSerializer.Deserialize<T>(results);
+            var deserialised = await JsonSerializer.DeserializeAsync<T>(results).ConfigureAwait(false);
             return deserialised;
         }
     }

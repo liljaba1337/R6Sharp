@@ -10,13 +10,13 @@ namespace R6Sharp
 {
     internal static class ApiHelper
     {
-        internal static async Task<string> GetDataAsync(string url, Guid player, IEnumerable<KeyValuePair<string, string>> queries, Session session)
+        internal static async Task<Stream> GetDataAsync(string url, Guid player, IEnumerable<KeyValuePair<string, string>> queries, Session session)
         {
             url = string.Format(url, player.ToString());
             return await GetDataAsync(url, queries, session).ConfigureAwait(false);
         }
 
-        internal static async Task<string> GetDataAsync(string url, Platform? platform, IEnumerable<KeyValuePair<string, string>> queries, Session session)
+        internal static async Task<Stream> GetDataAsync(string url, Platform? platform, IEnumerable<KeyValuePair<string, string>> queries, Session session)
         {
             if (platform != null)
             {
@@ -34,7 +34,7 @@ namespace R6Sharp
             return await GetDataAsync(url, queries, session).ConfigureAwait(false);
         }
 
-        private static async Task<string> GetDataAsync(string url, IEnumerable<KeyValuePair<string, string>> queries, Session session)
+        private static async Task<Stream> GetDataAsync(string url, IEnumerable<KeyValuePair<string, string>> queries, Session session)
         {
             if (queries != null)
             {
@@ -60,7 +60,7 @@ namespace R6Sharp
             return await BuildRequestAsync(uri, headerValuePairs.ToArray(), null, true).ConfigureAwait(false);
         }
 
-        internal static async Task<string> BuildRequestAsync(Uri uri, KeyValuePair<string, string>[] additionalHeaderValues, byte[] data, bool get)
+        internal static async Task<Stream> BuildRequestAsync(Uri uri, KeyValuePair<string, string>[] additionalHeaderValues, byte[] data, bool get)
         {
             // Build a web request to endpoint
             var request = WebRequest.CreateHttp(uri);
@@ -89,16 +89,12 @@ namespace R6Sharp
                 }
             }
 
-            string result;
             // Get result from Ubisoft and grab the json
             using (var response = (HttpWebResponse)request.GetResponse())
             using (var stream = response.GetResponseStream())
-            using (var reader = new StreamReader(stream))
             {
-                result = await reader.ReadToEndAsync().ConfigureAwait(false);
+                return stream;
             }
-
-            return result;
         }
 
         internal static string DeriveGamemodeFlags(Gamemode gamemode)

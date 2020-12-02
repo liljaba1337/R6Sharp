@@ -27,7 +27,7 @@ namespace R6Sharp.Endpoint
 
             var session = await _sessionHandler.GetCurrentSessionAsync().ConfigureAwait(false);
             var results = await ApiHelper.GetDataAsync(Endpoints.UbiServices.PlayerSkillRecords, platform, queries, session).ConfigureAwait(false);
-            var deserialised = JsonSerializer.Deserialize<PlayersSkillRecords>(results);
+            var deserialised = await JsonSerializer.DeserializeAsync<PlayersSkillRecords>(results).ConfigureAwait(false);
             return deserialised;
         }
 
