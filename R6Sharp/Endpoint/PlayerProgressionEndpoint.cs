@@ -35,7 +35,7 @@ namespace R6Sharp.Endpoint
             };
 
             var session = await _sessionHandler.GetCurrentSessionAsync().ConfigureAwait(false);
-            var results = await ApiHelper.GetDataAsync(Endpoints.UbiServices.Progressions, platform, queries, session).ConfigureAwait(false);
+            using var results = await ApiHelper.GetDataAsync(Endpoints.UbiServices.Progressions, platform, queries, session).ConfigureAwait(false);
             var deserialised = await JsonSerializer.DeserializeAsync<PlayerProgressionFetch>(results).ConfigureAwait(false);
             foreach (var result in deserialised.PlayerProgressions)
             {

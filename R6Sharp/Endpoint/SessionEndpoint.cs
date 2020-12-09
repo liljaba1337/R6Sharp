@@ -97,8 +97,8 @@ namespace R6Sharp.Endpoint
                 // Refresh current session details (will get new session if expired or non-existent)
                 _currentSession = await GetSessionAsync().ConfigureAwait(false);
                 // Save new session to file
-                var serialisedSession = JsonSerializer.Serialize<Session>(_currentSession);
-                File.WriteAllText(sessionFileName, serialisedSession);
+                using var file = File.OpenWrite(sessionFileName);
+                await JsonSerializer.SerializeAsync<Session>(file, _currentSession).ConfigureAwait(false);
             }
 
             return _currentSession.Ticket;
@@ -115,7 +115,7 @@ namespace R6Sharp.Endpoint
         private async Task<Session> GetSessionAsync()
         {
             // Build json for remembering (or not) the user/session
-            byte[] data = Encoding.UTF8.GetBytes($"{{\"rememberMe\": {(RememberMe ? "true" : "false")}}}");
+            var data = $"{{\"rememberMe\": {(RememberMe ? "true" : "false")}}}";
             // Add authorization header
             var headervaluepairs = new[]
             {
@@ -124,7 +124,7 @@ namespace R6Sharp.Endpoint
 
             // Get result from endpoint
             var endpoint = new Uri(Endpoints.UbiServices.Sessions);
-            var response = await ApiHelper.BuildRequestAsync(endpoint, headervaluepairs, data, false).ConfigureAwait(false);
+            using var response = await ApiHelper.BuildRequestAsync(endpoint, headervaluepairs, data, false).ConfigureAwait(false);
             return await JsonSerializer.DeserializeAsync<Session>(response).ConfigureAwait(false);
         }
     }

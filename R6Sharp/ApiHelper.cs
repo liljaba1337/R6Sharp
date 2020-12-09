@@ -2,8 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
+using System.Net.Http;
 using System.Net.Mime;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace R6Sharp
@@ -60,41 +61,35 @@ namespace R6Sharp
             return await BuildRequestAsync(uri, headerValuePairs.ToArray(), null, true).ConfigureAwait(false);
         }
 
-        internal static async Task<Stream> BuildRequestAsync(Uri uri, KeyValuePair<string, string>[] additionalHeaderValues, byte[] data, bool get)
+        internal static async Task<Stream> BuildRequestAsync(Uri uri, KeyValuePair<string, string>[] additionalHeaderValues, string data, bool get)
         {
             // Build a web request to endpoint
-            var request = WebRequest.CreateHttp(uri);
-            // Set request method
-            request.Method = get ? WebRequestMethods.Http.Get : WebRequestMethods.Http.Post;
-            // Apply usual request headers that should be in all requests to Ubisoft
-            if (!uri.AbsoluteUri.Contains("r6s-stats"))
+            using var request = new HttpRequestMessage()
             {
-                request.Headers.Add(HttpRequestHeader.ContentType, MediaTypeNames.Application.Json);
-            }
-            request.Headers.Add("Ubi-AppId", Constant.Rainbow6S.ToString());
-            request.Headers.Add(HttpRequestHeader.UserAgent, "R6Sharp/2.0");
+                RequestUri = uri,
+                Method = get ? HttpMethod.Get : HttpMethod.Post,
+                Headers =
+                {
+                    { "Ubi-AppId", Constant.Rainbow6S.ToString() },
+                    { "User-Agent", "R6Sharp/2.0" }
+                }
+            };
+
             // Apply auxiliary headers supplied to method
             foreach (var additionalHeaderValue in additionalHeaderValues)
             {
                 request.Headers.Add(additionalHeaderValue.Key, additionalHeaderValue.Value);
             }
 
-            // If we have some data to send, write it to stream (make sure it is POST)
-            if (data != null && request.Method.Equals("POST"))
+            if (data != null && request.Method == HttpMethod.Post)
             {
-                request.ContentLength = data.Length;
-                using (var stream = request.GetRequestStream())
-                {
-                    await stream.WriteAsync(data).ConfigureAwait(false);
-                }
+                request.Content = new StringContent(data, Encoding.UTF8, MediaTypeNames.Application.Json);
             }
 
-            // Get result from Ubisoft and grab the json
-            using (var response = (HttpWebResponse)request.GetResponse())
-            using (var stream = response.GetResponseStream())
-            {
-                return stream;
-            }
+            var client = new HttpClient();
+            var response = await client.SendAsync(request).ConfigureAwait(false);
+            var content = response.Content;
+            return await content.ReadAsStreamAsync().ConfigureAwait(false);
         }
 
         internal static string DeriveGamemodeFlags(Gamemode gamemode)

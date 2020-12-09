@@ -145,7 +145,7 @@ namespace R6Sharp.Endpoint
             };
 
             var session = await _sessionHandler.GetCurrentSessionAsync().ConfigureAwait(false);
-            var results = await ApiHelper.GetDataAsync(Endpoints.UbiServices.Players, platform, queries, session).ConfigureAwait(false);
+            using var results = await ApiHelper.GetDataAsync(Endpoints.UbiServices.Players, platform, queries, session).ConfigureAwait(false);
             var deserialised = await JsonSerializer.DeserializeAsync<BoardInfoFetch>(results).ConfigureAwait(false);
             return deserialised.Players;
         }
