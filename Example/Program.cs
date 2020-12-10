@@ -66,7 +66,10 @@ namespace Example
 
             var gamemodes = Gamemode.All | Gamemode.Ranked | Gamemode.Unranked | Gamemode.Casual;
             var from = new DateTime(2020, 06, 16);
-            var to = new DateTime(2020, 11, 26);
+            // Narrative is weekly, therefore it is better thing to use UtcNow
+            // over specific dates unless you need a specific period
+            // var to = new DateTime(2020, 06, 16);
+            var to = DateTime.UtcNow;
 
             var summary = api.GetSummaryAsync(uuid, gamemodes, platform, from, to).Result;
             var summaryKills = summary.Platforms["PC"]
