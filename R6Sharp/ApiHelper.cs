@@ -1,22 +1,25 @@
-﻿using R6Sharp.Response;
+﻿using R6Sharp.Exceptions;
+using R6Sharp.Response;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Net.Mime;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace R6Sharp
 {
     internal static class ApiHelper
     {
-        internal static async Task<string> GetDataAsync(string url, Guid player, IEnumerable<KeyValuePair<string, string>> queries, Session session)
+        internal static async Task<Stream> GetDataAsync(string url, Guid player, IEnumerable<KeyValuePair<string, string>> queries, Session session)
         {
             url = string.Format(url, player.ToString());
             return await GetDataAsync(url, queries, session).ConfigureAwait(false);
         }
 
-        internal static async Task<string> GetDataAsync(string url, Platform? platform, IEnumerable<KeyValuePair<string, string>> queries, Session session)
+        internal static async Task<Stream> GetDataAsync(string url, Platform? platform, IEnumerable<KeyValuePair<string, string>> queries, Session session)
         {
             if (platform != null)
             {
@@ -34,7 +37,7 @@ namespace R6Sharp
             return await GetDataAsync(url, queries, session).ConfigureAwait(false);
         }
 
-        private static async Task<string> GetDataAsync(string url, IEnumerable<KeyValuePair<string, string>> queries, Session session)
+        private static async Task<Stream> GetDataAsync(string url, IEnumerable<KeyValuePair<string, string>> queries, Session session)
         {
             if (queries != null)
             {
@@ -57,48 +60,66 @@ namespace R6Sharp
                 headerValuePairs.Add(new KeyValuePair<string, string>("Expiration", session.Expiration.ToString("O")));
                 headerValuePairs.Add(new KeyValuePair<string, string>("Ubi-SessionID", session.SessionId.ToString()));
             }
-            return await BuildRequestAsync(uri, headerValuePairs.ToArray(), null, true).ConfigureAwait(false);
+
+            var result = await BuildRequestAsync(uri, headerValuePairs.ToArray(), null, true).ConfigureAwait(false);
+            return EnsureRequestSuccess(result);
         }
 
-        internal static async Task<string> BuildRequestAsync(Uri uri, KeyValuePair<string, string>[] additionalHeaderValues, byte[] data, bool get)
+        internal static async Task<Tuple<HttpStatusCode, Stream>> BuildRequestAsync(Uri uri, KeyValuePair<string, string>[] additionalHeaderValues, string data, bool get)
         {
             // Build a web request to endpoint
-            var request = WebRequest.CreateHttp(uri);
-            // Set request method
-            request.Method = get ? WebRequestMethods.Http.Get : WebRequestMethods.Http.Post;
-            // Apply usual request headers that should be in all requests to Ubisoft
-            if (!uri.AbsoluteUri.Contains("r6s-stats"))
+            using var request = new HttpRequestMessage()
             {
-                request.Headers.Add(HttpRequestHeader.ContentType, MediaTypeNames.Application.Json);
-            }
-            request.Headers.Add("Ubi-AppId", Constant.Rainbow6S.ToString());
-            request.Headers.Add(HttpRequestHeader.UserAgent, "R6Sharp/2.0");
+                RequestUri = uri,
+                Method = get ? HttpMethod.Get : HttpMethod.Post,
+                Headers =
+                {
+                    { "Ubi-AppId", Constant.Rainbow6S.ToString() },
+                    { "User-Agent", "R6Sharp/2.0" }
+                }
+            };
+
             // Apply auxiliary headers supplied to method
             foreach (var additionalHeaderValue in additionalHeaderValues)
             {
                 request.Headers.Add(additionalHeaderValue.Key, additionalHeaderValue.Value);
             }
 
-            // If we have some data to send, write it to stream (make sure it is POST)
-            if (data != null && request.Method.Equals("POST"))
+            if (data != null && request.Method == HttpMethod.Post)
             {
-                request.ContentLength = data.Length;
-                using (var stream = request.GetRequestStream())
-                {
-                    await stream.WriteAsync(data).ConfigureAwait(false);
-                }
+                request.Content = new StringContent(data, Encoding.UTF8, MediaTypeNames.Application.Json);
             }
 
-            string result;
-            // Get result from Ubisoft and grab the json
-            using (var response = (HttpWebResponse)request.GetResponse())
-            using (var stream = response.GetResponseStream())
-            using (var reader = new StreamReader(stream))
+            var client = new HttpClient();
+            var response = await client.SendAsync(request).ConfigureAwait(false);
+            response = response.EnsureSuccessStatusCode();
+            var content = response.Content;
+            var stream = await content.ReadAsStreamAsync().ConfigureAwait(false);
+            if (response.StatusCode == HttpStatusCode.NoContent || stream == null || (stream != null && stream.Length == 0))
             {
-                result = await reader.ReadToEndAsync().ConfigureAwait(false);
+                return new Tuple<HttpStatusCode, Stream>(response.StatusCode, null);
             }
+            else
+            {
+                return new Tuple<HttpStatusCode, Stream>(response.StatusCode, stream);
+            }
+        }
 
-            return result;
+        private static Stream EnsureRequestSuccess(Tuple<HttpStatusCode, Stream> result)
+        {
+            // TO-DO: this is potentially ambiguous as only status 200 and 204 is processed and
+            // other 200 codes will be processed incorrectly
+            if (result.Item1 == HttpStatusCode.NoContent ||
+                result.Item1 == HttpStatusCode.OK)
+            {
+                // BuildRequestAsync already returns null/Stream for NoContent and OK
+                // respectively, so return as such.
+                return result.Item2;
+            }
+            else
+            {
+                throw new ApiBadResponseException($"Bad response from endpoint: status code {result.Item1}.");
+            }
         }
 
         internal static string DeriveGamemodeFlags(Gamemode gamemode)

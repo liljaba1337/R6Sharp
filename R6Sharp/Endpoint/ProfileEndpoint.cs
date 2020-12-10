@@ -63,8 +63,8 @@ namespace R6Sharp.Endpoint
             queries.Add(new KeyValuePair<string, string>(queryKey, queryValue));
 
             var session = await _sessionHandler.GetCurrentSessionAsync().ConfigureAwait(false);
-            var results = await ApiHelper.GetDataAsync(Endpoints.UbiServices.Search, null, queries, session).ConfigureAwait(false);
-            var deserialised = JsonSerializer.Deserialize<ProfileSearch>(results);
+            using var results = await ApiHelper.GetDataAsync(Endpoints.UbiServices.Search, null, queries, session).ConfigureAwait(false);
+            var deserialised = await JsonSerializer.DeserializeAsync<ProfileSearch>(results).ConfigureAwait(false);
             return deserialised.Profiles;
         }
     }

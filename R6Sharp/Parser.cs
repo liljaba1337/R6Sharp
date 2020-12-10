@@ -149,7 +149,7 @@ namespace R6Sharp
                 }
                 catch (FormatException)
                 {
-                    var date = DateTime.ParseExact(value, "yyyy-MM-dd HH:mm:ss.fff", null);
+                    var date = DateTime.ParseExact(value, "yyyy-MM-dd HH:mm:ss.FFF", null);
                     return date;
                 }
             }
