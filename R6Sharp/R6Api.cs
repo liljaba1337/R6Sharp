@@ -218,9 +218,16 @@ namespace R6Sharp
         private async Task<T> GetData<T>(string endpoint, Guid uuid, KeyValuePair<string, string>[] queries)
         {
             var session = await _session.GetCurrentSessionAsync().ConfigureAwait(false);
-            using var results = await ApiHelper.GetDataAsync(endpoint, uuid, queries, session).ConfigureAwait(false);
-            var deserialised = await JsonSerializer.DeserializeAsync<T>(results).ConfigureAwait(false);
-            return deserialised;
+            using var stream = await ApiHelper.GetDataAsync(endpoint, uuid, queries, session).ConfigureAwait(false);
+            if (stream != null)
+            {
+                var deserialised = await JsonSerializer.DeserializeAsync<T>(stream).ConfigureAwait(false);
+                return deserialised;
+            }
+            else
+            {
+                return default;
+            }
         }
     }
 }

@@ -1,7 +1,9 @@
-﻿using R6Sharp.Response;
+﻿using R6Sharp.Exceptions;
+using R6Sharp.Response;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
@@ -58,10 +60,12 @@ namespace R6Sharp
                 headerValuePairs.Add(new KeyValuePair<string, string>("Expiration", session.Expiration.ToString("O")));
                 headerValuePairs.Add(new KeyValuePair<string, string>("Ubi-SessionID", session.SessionId.ToString()));
             }
-            return await BuildRequestAsync(uri, headerValuePairs.ToArray(), null, true).ConfigureAwait(false);
+
+            var result = await BuildRequestAsync(uri, headerValuePairs.ToArray(), null, true).ConfigureAwait(false);
+            return EnsureRequestSuccess(result);
         }
 
-        internal static async Task<Stream> BuildRequestAsync(Uri uri, KeyValuePair<string, string>[] additionalHeaderValues, string data, bool get)
+        internal static async Task<Tuple<HttpStatusCode, Stream>> BuildRequestAsync(Uri uri, KeyValuePair<string, string>[] additionalHeaderValues, string data, bool get)
         {
             // Build a web request to endpoint
             using var request = new HttpRequestMessage()
@@ -88,8 +92,34 @@ namespace R6Sharp
 
             var client = new HttpClient();
             var response = await client.SendAsync(request).ConfigureAwait(false);
+            response = response.EnsureSuccessStatusCode();
             var content = response.Content;
-            return await content.ReadAsStreamAsync().ConfigureAwait(false);
+            var stream = await content.ReadAsStreamAsync().ConfigureAwait(false);
+            if (response.StatusCode == HttpStatusCode.NoContent || stream == null || (stream != null && stream.Length == 0))
+            {
+                return new Tuple<HttpStatusCode, Stream>(response.StatusCode, null);
+            }
+            else
+            {
+                return new Tuple<HttpStatusCode, Stream>(response.StatusCode, stream);
+            }
+        }
+
+        private static Stream EnsureRequestSuccess(Tuple<HttpStatusCode, Stream> result)
+        {
+            // TO-DO: this is potentially ambiguous as only status 200 and 204 is processed and
+            // other 200 codes will be processed incorrectly
+            if (result.Item1 == HttpStatusCode.NoContent ||
+                result.Item1 == HttpStatusCode.OK)
+            {
+                // BuildRequestAsync already returns null/Stream for NoContent and OK
+                // respectively, so return as such.
+                return result.Item2;
+            }
+            else
+            {
+                throw new ApiBadResponseException($"Bad response from endpoint: status code {result.Item1}.");
+            }
         }
 
         internal static string DeriveGamemodeFlags(Gamemode gamemode)

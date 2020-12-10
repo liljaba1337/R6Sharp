@@ -124,8 +124,9 @@ namespace R6Sharp.Endpoint
 
             // Get result from endpoint
             var endpoint = new Uri(Endpoints.UbiServices.Sessions);
-            using var response = await ApiHelper.BuildRequestAsync(endpoint, headervaluepairs, data, false).ConfigureAwait(false);
-            return await JsonSerializer.DeserializeAsync<Session>(response).ConfigureAwait(false);
+            var response = await ApiHelper.BuildRequestAsync(endpoint, headervaluepairs, data, false).ConfigureAwait(false);
+            using var stream = response.Item2;
+            return await JsonSerializer.DeserializeAsync<Session>(stream).ConfigureAwait(false);
         }
     }
 }
