@@ -19,6 +19,8 @@
                 "https://public-ubiservices.ubi.com/v1/spaces/{0}/sandboxes/{1}/r6karma/players";
             internal const string PlayerSkillRecords =
                 "https://public-ubiservices.ubi.com/v1/spaces/{0}/sandboxes/{1}/r6karma/player_skill_records";
+            internal const string Statistics =
+                "https://public-ubiservices.ubi.com/v1/spaces/{0}/sandboxes/{1}/playerstats2/statistics";
         }
 
         internal static class R6SStats

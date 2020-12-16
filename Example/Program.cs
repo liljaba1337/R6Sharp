@@ -64,6 +64,10 @@ namespace Example
                                               .PlayerSkillRecords.First()
                                               .MMR;
 
+            var queues = api.PlayerStatisticsEndpoint.GetQueueStatisticsAsync(uuid, platform).Result;
+            // Time played in ranked since recorded history (in seconds)
+            var rankedPlaytimeInfinite = queues["rankedpvp_timeplayed:infinite"];
+
             var gamemodes = Gamemode.All | Gamemode.Ranked | Gamemode.Unranked | Gamemode.Casual;
             var from = new DateTime(2020, 06, 16);
             // Narrative is weekly, therefore it is better thing to use UtcNow

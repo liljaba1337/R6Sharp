@@ -69,6 +69,7 @@ namespace R6Sharp
         public PlayerProgressionEndpoint PlayerProgression { get; }
         public PlayerEndpoint Player { get; }
         public PlayersSkillRecordsEndpoint PlayersSkillRecordsEndpoint { get; }
+        public PlayerStatisticsEndpoint PlayerStatisticsEndpoint { get; }
 
         #region Constructors
         /// <summary>
@@ -113,6 +114,7 @@ namespace R6Sharp
             PlayerProgression = new PlayerProgressionEndpoint(_session);
             Player = new PlayerEndpoint(_session);
             PlayersSkillRecordsEndpoint = new PlayersSkillRecordsEndpoint(_session);
+            PlayerStatisticsEndpoint = new PlayerStatisticsEndpoint(_session);
         }
         #endregion
 
