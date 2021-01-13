@@ -218,5 +218,25 @@ namespace R6Sharp
                 writer.WriteStringValue(value.ToString());
             }
         }
+
+        internal class ParseStringToPlatform : JsonConverter<Platform>
+        {
+            public override Platform Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+            {
+                var platform = reader.GetString();
+                return platform switch
+                {
+                    "uplay" => Platform.PC,
+                    "psn" => Platform.PSN,
+                    "xbl" => Platform.XBL,
+                    _ => throw new UnrecognizedDataException($"Could not recognize \"{platform}\" as {typeof(Platform).Name}.")
+                };
+            }
+
+            public override void Write(Utf8JsonWriter writer, Platform value, JsonSerializerOptions options)
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 }

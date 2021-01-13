@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using static R6Sharp.Parser;
 
 namespace R6Sharp.Response
 {
@@ -19,7 +20,8 @@ namespace R6Sharp.Response
         public Guid UserId { get; set; }
 
         [JsonPropertyName("platformType")]
-        public string PlatformType { get; set; }
+        [JsonConverter(typeof(ParseStringToPlatform))]
+        public Platform PlatformType { get; set; }
 
         [JsonPropertyName("idOnPlatform")]
         public Guid IdOnPlatform { get; set; }
