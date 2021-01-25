@@ -24,7 +24,7 @@ namespace R6Sharp.Response
         public Platform PlatformType { get; set; }
 
         [JsonPropertyName("idOnPlatform")]
-        public Guid IdOnPlatform { get; set; }
+        public string IdOnPlatform { get; set; }
 
         [JsonPropertyName("nameOnPlatform")]
         public string NameOnPlatform { get; set; }
