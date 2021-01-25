@@ -30,12 +30,24 @@ namespace R6Sharp.Endpoint
         /// </returns>
         public async Task<List<Profile>> GetProfileAsync(string[] players, Platform platform)
         {
+            foreach (var player in players)
+            {
+                if (string.IsNullOrEmpty(player))
+                {
+                    throw new ArgumentException($"Provided PlayerName ({player}) cannot be null or empty.");
+                }
+                else if (player.Contains(' '))
+                {
+                    throw new ArgumentException($"Provided PlayerName ({player}) cannot contain whitespaces.");
+                }
+            }
+
             return await Get(platform, "nameOnPlatform", HttpUtility.UrlEncode(string.Join(',', players))).ConfigureAwait(false);
         }
 
         public async Task<List<Profile>> GetProfileAsync(Guid[] uuids, Platform platform)
         {
-            return await Get(platform, "idOnPlatform", HttpUtility.UrlEncode(string.Join(',', uuids))).ConfigureAwait(false);
+            return await Get(platform, "userId", HttpUtility.UrlEncode(string.Join(',', uuids))).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
