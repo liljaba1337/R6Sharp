@@ -36,10 +36,6 @@ namespace R6Sharp.Endpoint
                 {
                     throw new ArgumentException($"Provided PlayerName ({player}) cannot be null or empty.");
                 }
-                else if (player.Contains(' '))
-                {
-                    throw new ArgumentException($"Provided PlayerName ({player}) cannot contain whitespaces.");
-                }
             }
 
             return await Get(platform, "nameOnPlatform", HttpUtility.UrlEncode(string.Join(',', players))).ConfigureAwait(false);

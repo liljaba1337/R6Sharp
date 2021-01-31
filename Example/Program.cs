@@ -41,7 +41,7 @@ namespace Example
             var platform = Platform.PC;
 
             Profile profile = api.Profile.GetProfileAsync(username, platform).Result;
-            var uuid = profile.ProfileId;
+            var uuid = profile.UserId;
 
             PlayerProgression playerProgression = api.PlayerProgression.GetPlayerProgressionAsync(uuid, platform).Result;
             var playerLevel = playerProgression.Level;
