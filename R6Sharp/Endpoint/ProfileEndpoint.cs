@@ -38,12 +38,12 @@ namespace R6Sharp.Endpoint
                 }
             }
 
-            return await Get(platform, "nameOnPlatform", HttpUtility.UrlEncode(string.Join(',', players))).ConfigureAwait(false);
+            return await Get(platform, "namesOnPlatform", HttpUtility.UrlEncode(string.Join(',', players))).ConfigureAwait(false);
         }
 
-        public async Task<List<Profile>> GetProfileAsync(Guid[] uuids, Platform platform)
+        public async Task<List<Profile>> GetProfileAsync(Guid[] uuids)
         {
-            return await Get(platform, "userId", HttpUtility.UrlEncode(string.Join(',', uuids))).ConfigureAwait(false);
+            return await Get(null, "profileIds", HttpUtility.UrlEncode(string.Join(',', uuids))).ConfigureAwait(false);
         }
 
         /// <inheritdoc/>
@@ -55,19 +55,21 @@ namespace R6Sharp.Endpoint
         }
 
         /// <inheritdoc/>
-        public async Task<Profile> GetProfileAsync(Guid uuid, Platform platform)
+        public async Task<Profile> GetProfileAsync(Guid uuid)
         {
-            var profiles = await GetProfileAsync(new Guid[] { uuid }, platform).ConfigureAwait(false);
+            var profiles = await GetProfileAsync(new Guid[] { uuid }).ConfigureAwait(false);
             // the search result could contain more than one result, return first anyways
             return profiles.Count > 0 ? profiles[0] : null;
         }
 
-        private async Task<List<Profile>> Get(Platform platform, string queryKey, string queryValue)
+        private async Task<List<Profile>> Get(Platform? platform, string queryKey, string queryValue)
         {
-            var queries = new List<KeyValuePair<string, string>>
+            var queries = new List<KeyValuePair<string, string>>();
+            if (platform.HasValue)
             {
-                new KeyValuePair<string, string>("platformType", Constant.PlatformToString(platform))
-            };
+                var query = new KeyValuePair<string, string>("platformType", Constant.PlatformToString(platform.Value));
+                queries.Add(query);
+            }
             queries.Add(new KeyValuePair<string, string>(queryKey, queryValue));
 
             var session = await _sessionHandler.GetCurrentSessionAsync().ConfigureAwait(false);
