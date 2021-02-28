@@ -1,6 +1,5 @@
 ﻿using R6Sharp.Exceptions;
 using R6Sharp.Response.DataResponse;
-using R6Sharp.Response.Static;
 using R6Sharp.Response.Statistic;
 using System;
 using System.Buffers;
@@ -59,27 +58,6 @@ namespace R6Sharp
             }
 
             public override void Write(Utf8JsonWriter writer, Uri value, JsonSerializerOptions options)
-            {
-                writer.WriteStringValue(value.ToString());
-            }
-        }
-
-        internal class ParseStringToId : JsonConverter<RankId>
-        {
-            public override RankId Read(ref Utf8JsonReader reader, Type type, JsonSerializerOptions options)
-            {
-                if (reader.TokenType == JsonTokenType.String)
-                {
-                    if (Enum.TryParse(reader.GetString(), true, out RankId id))
-                    {
-                        return id;
-                    }
-                }
-
-                return Enum.Parse<RankId>(reader.GetString());
-            }
-
-            public override void Write(Utf8JsonWriter writer, RankId value, JsonSerializerOptions options)
             {
                 writer.WriteStringValue(value.ToString());
             }
