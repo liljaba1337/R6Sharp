@@ -49,12 +49,12 @@ namespace R6Sharp.Response
         [JsonPropertyName("rank")]
         public int Rank { get; set; }
 
-        public RankInfo BoardRankDetails => new RankInfo(this, RankInfo.RankType.RankMMR);
+        public RankInfo RankInfo => new RankInfo(this, RankInfo.RankType.RankMMR);
 
         [JsonPropertyName("max_rank")]
         public int MaxRank { get; set; }
 
-        public RankInfo BoardMaxRankDetails => new RankInfo(this, RankInfo.RankType.RankMMR); 
+        public RankInfo MaxRankInfo => new RankInfo(this, RankInfo.RankType.RankMMR); 
 
         [JsonPropertyName("mmr")]
         public double MMR { get; set; }
