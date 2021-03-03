@@ -92,7 +92,7 @@ namespace R6Sharp.Response
     /// </summary>
     public class RankInfo
     {
-        private static readonly Uri _baseUrl = new Uri("https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn");
+        private static readonly Uri _baseUrl = new Uri("https://staticctf.akamaized.net/J3yJr34U2pZ2Ieem48Dwy9uqj5PNUQTn/");
         private static readonly Tuple<string, int, int, Uri>[] _ranks = new Tuple<string, int, int, Uri>[]
         {
                 new Tuple<string, int, int, Uri>("Unranked",        -1,     -1,
