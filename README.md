@@ -1,6 +1,8 @@
-# R6Sharp [![Build status](https://ci.appveyor.com/api/projects/status/ydmu8g5r0dxifa0h?svg=true)](https://ci.appveyor.com/project/SergeantSerk/r6sharp) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/02ef54cb799443bab57ebb543fa78778)](https://app.codacy.com/manual/SergeantSerk/R6Sharp?utm_source=github.com&utm_medium=referral&utm_content=SergeantSerk/R6Sharp&utm_campaign=Badge_Grade_Dashboard) [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FSergeantSerk%2FR6Sharp.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FSergeantSerk%2FR6Sharp?ref=badge_shield)
+# R6Sharp
 ## Description
 An (unofficial) API wrapper for Rainbow 6 Siege to get player stats from Ubisoft's website. Although Ubisoft does not provide an official API endpoint for developers to retrieve player data (therefore not explicitly sanctioned), their own pages retrieve it through web requests using JavaScript to specific endpoints.
+## Original developer
+This project is the continuation of [SergeantSerk's R6Sharp](https://github.com/SergeantSerk/R6Sharp). Please refer to the original repository for the initial code.
 ## Usage
 Please see the [Example](Example/Program.cs) project to see how to use this wrapper. Alternatively, here's an example:
 ```csharp
