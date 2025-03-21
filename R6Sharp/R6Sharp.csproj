@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageLicenseExpression></PackageLicenseExpression>
+    <PackageLicenseExpression>
+    </PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/SergeantSerk/R6Sharp/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/SergeantSerk/R6Sharp/</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
@@ -13,16 +13,14 @@
     <Authors>SergeantSerk</Authors>
     <Company>SergeantSerk</Company>
   </PropertyGroup>
-
   <ItemGroup>
     <None Include="..\LICENSE">
       <Pack>True</Pack>
-      <PackagePath></PackagePath>
+      <PackagePath>
+      </PackagePath>
     </None>
   </ItemGroup>
-
   <Target Name="NugetPackAutoVersioning" AfterTargets="Build">
     <Exec Command="dotnet pack -p:PackageVersion=$([System.DateTime]::Now.ToString(&quot;yyyy.MM.dd.HHmmss&quot;)) --no-build --configuration $(Configuration) --output &quot;$(SolutionDir)nuget" />
   </Target>
-
 </Project>

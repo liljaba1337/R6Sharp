@@ -93,6 +93,8 @@ namespace R6Sharp
 
             var client = new HttpClient();
             var response = await client.SendAsync(request).ConfigureAwait(false);
+            Console.WriteLine("REQUEST >>");
+            Console.WriteLine(await response.Content.ReadAsStringAsync());
             response = response.EnsureSuccessStatusCode();
             var content = response.Content;
             var stream = await content.ReadAsStreamAsync().ConfigureAwait(false);

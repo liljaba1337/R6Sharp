@@ -71,7 +71,7 @@ namespace R6Sharp
         private const string WeaponTypePve = "weapontypepve_accuracy,weapontypepve_bulletfired,weapontypepve_bullethit,weapontypepve_chosen,weapontypepve_dbno,weapontypepve_dbnoassists,weapontypepve_death,weapontypepve_deaths,weapontypepve_efficiency,weapontypepve_headshot,weapontypepve_headshotratio,weapontypepve_kdratio,weapontypepve_killassists,weapontypepve_kills,weapontypepve_mostkills,weapontypepve_power";
         private const string WeaponTypePvp = "weapontypepvp_accuracy,weapontypepvp_bulletfired,weapontypepvp_bullethit,weapontypepvp_chosen,weapontypepvp_dbno,weapontypepvp_dbnoassists,weapontypepvp_death,weapontypepvp_deaths,weapontypepvp_efficiency,weapontypepvp_headshot,weapontypepvp_headshotratio,weapontypepvp_kdratio,weapontypepvp_killassists,weapontypepvp_kills,weapontypepvp_mostkills,weapontypepvp_power";
 
-        internal static readonly Guid Rainbow6S = Guid.Parse("39baebad-39e5-4552-8c25-2c9b919064e2");
+        internal static readonly Guid Rainbow6S = Guid.Parse("685a3038-2b04-47ee-9c5a-6403381a46aa");
         internal static readonly Guid Uplay = Guid.Parse("5172a557-50b5-4665-b7db-e3f2e8c5041d");
         internal static readonly Guid PSN = Guid.Parse("05bfb3f7-6c21-4c42-be1f-97a33fb5cf66");
         internal static readonly Guid XBL = Guid.Parse("98a601e5-ca91-4440-b1c5-753f601a2c90");

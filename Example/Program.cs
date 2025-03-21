@@ -37,7 +37,7 @@ namespace Example
                 Guid.Parse("44444444-4444-4444-4444-444444444444")
             };
 
-            var username = "Sudocrem.";
+            var username = "liljaba1337";
             var platform = Platform.PC;
 
             Profile profile = api.Profile.GetProfileAsync(username, platform).Result;
